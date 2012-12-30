@@ -45,8 +45,8 @@ public class RegionMemberCommands {
         this.plugin = plugin;
     }
     
-    @Command(aliases = {"addmember", "addmember"}, usage = "<id> <members...>",
-            desc = "Add a member to a region", min = 2)
+    @Command(aliases = {"addmember", "addmember"}, usage = "<id> <игроки...>",
+            desc = "Добавляет учасника(ов) в заданый регион", min = 2)
     public void addMember(CommandContext args, CommandSender sender) throws CommandException {
         
         Player player = plugin.checkPlayer(sender);
@@ -59,7 +59,7 @@ public class RegionMemberCommands {
         ProtectedRegion region = mgr.getRegion(id);
 
         if (region == null) {
-            throw new CommandException("Could not find a region by that ID.");
+            throw new CommandException("Регион с таким ID не найден.");
         }
 
         id = region.getId();
@@ -75,18 +75,18 @@ public class RegionMemberCommands {
         RegionDBUtil.addToDomain(region.getMembers(), args.getPaddedSlice(2, 0), 0);
 
         sender.sendMessage(ChatColor.YELLOW
-                + "Region '" + id + "' updated.");
+                + "Регион '" + id + "' обновлен.");
         
         try {
             mgr.save();
         } catch (ProtectionDatabaseException e) {
-            throw new CommandException("Failed to write regions: "
+            throw new CommandException("Ошибка обновления региона: "
                     + e.getMessage());
         }
     }
     
-    @Command(aliases = {"addowner", "addowner"}, usage = "<id> <owners...>",
-            desc = "Add an owner to a region", min = 2)
+    @Command(aliases = {"addowner", "addowner"}, usage = "<id> <игроки...>",
+            desc = "Добавляет владельца(ов) в регион", min = 2)
     public void addOwner(CommandContext args, CommandSender sender) throws CommandException {
         
         Player player = plugin.checkPlayer(sender);
@@ -99,7 +99,7 @@ public class RegionMemberCommands {
         ProtectedRegion region = mgr.getRegion(id);
 
         if (region == null) {
-            throw new CommandException("Could not find a region by that ID.");
+            throw new CommandException("Регион с таким ID не найден.");
         }
 
         id = region.getId();
@@ -128,18 +128,18 @@ public class RegionMemberCommands {
         RegionDBUtil.addToDomain(region.getOwners(), args.getPaddedSlice(2, 0), 0);
 
         sender.sendMessage(ChatColor.YELLOW
-                + "Region '" + id + "' updated.");
+                + "Регион '" + id + "' обновлен.");
         
         try {
             mgr.save();
         } catch (ProtectionDatabaseException e) {
-            throw new CommandException("Failed to write regions: "
+            throw new CommandException("Ошибка убновления региона: "
                     + e.getMessage());
         }
     }
     
-    @Command(aliases = {"removemember", "remmember", "removemem", "remmem"}, usage = "<id> <owners...>",
-            desc = "Remove an owner to a region", min = 2)
+    @Command(aliases = {"removemember", "remmember", "removemem", "remmem"}, usage = "<id> <игроки...>",
+            desc = "Убирает учасника(ов) из региона", min = 2)
     public void removeMember(CommandContext args, CommandSender sender) throws CommandException {
         
         Player player = plugin.checkPlayer(sender);
@@ -152,7 +152,7 @@ public class RegionMemberCommands {
         ProtectedRegion region = mgr.getRegion(id);
 
         if (region == null) {
-            throw new CommandException("Could not find a region by that ID.");
+            throw new CommandException("Регион с таким ID не найден.");
         }
 
         id = region.getId();
@@ -168,18 +168,18 @@ public class RegionMemberCommands {
         RegionDBUtil.removeFromDomain(region.getMembers(), args.getPaddedSlice(2, 0), 0);
 
         sender.sendMessage(ChatColor.YELLOW
-                + "Region '" + id + "' updated.");
+                + "Регион '" + id + "' обновлен.");
         
         try {
             mgr.save();
         } catch (ProtectionDatabaseException e) {
-            throw new CommandException("Failed to write regions: "
+            throw new CommandException("Ошибка обновления региона: "
                     + e.getMessage());
         }
     }
     
-    @Command(aliases = {"removeowner", "remowner"}, usage = "<id> <owners...>",
-            desc = "Remove an owner to a region", min = 2)
+    @Command(aliases = {"removeowner", "remowner"}, usage = "<id> <игроки...>",
+            desc = "Убирает владельца(ов) из региона", min = 2)
     public void removeOwner(CommandContext args,
             CommandSender sender) throws CommandException {
         
@@ -193,7 +193,7 @@ public class RegionMemberCommands {
         ProtectedRegion region = mgr.getRegion(id);
 
         if (region == null) {
-            throw new CommandException("Could not find a region by that ID.");
+            throw new CommandException("Регион с таким ID не найден.");
         }
 
         id = region.getId();
@@ -209,12 +209,12 @@ public class RegionMemberCommands {
         RegionDBUtil.removeFromDomain(region.getOwners(), args.getPaddedSlice(2, 0), 0);
 
         sender.sendMessage(ChatColor.YELLOW
-                + "Region '" + id + "' updated.");
+                + "Регион '" + id + "' обновлен.");
         
         try {
             mgr.save();
         } catch (ProtectionDatabaseException e) {
-            throw new CommandException("Failed to write regions: "
+            throw new CommandException("Ошибка обновления региона: "
                     + e.getMessage());
         }
     }

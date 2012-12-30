@@ -889,8 +889,8 @@ public class WorldGuardEntityListener implements Listener {
         final DisallowedPVPEvent disallowedPVPEvent = new DisallowedPVPEvent(attackingPlayer, defendingPlayer, event);
         plugin.getServer().getPluginManager().callEvent(disallowedPVPEvent);
         if (!disallowedPVPEvent.isCancelled()) {
-            if (aggressorTriggered) attackingPlayer.sendMessage(ChatColor.DARK_RED + "You are in a no-PvP area.");
-            else attackingPlayer.sendMessage(ChatColor.DARK_RED + "That player is in a no-PvP area.");
+            if (aggressorTriggered) attackingPlayer.sendMessage(ChatColor.DARK_RED + "В данной зоне PvP отключено.");
+            else attackingPlayer.sendMessage(ChatColor.DARK_RED + "Данный игрок находится в зоне где PvP отключено.");
             event.setCancelled(true);
         }
     }

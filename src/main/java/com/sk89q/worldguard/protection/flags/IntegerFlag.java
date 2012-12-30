@@ -44,7 +44,7 @@ public class IntegerFlag extends Flag<Integer> {
         try {
             return Integer.parseInt(input);
         } catch (NumberFormatException e) {
-            throw new InvalidFlagFormat("Not a number: " + input);
+            throw new InvalidFlagFormat("Значение не числовое: " + input);
         }
     }
 

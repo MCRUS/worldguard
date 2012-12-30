@@ -44,7 +44,7 @@ public class DoubleFlag extends Flag<Double> {
         try {
             return Double.parseDouble(input);
         } catch (NumberFormatException e) {
-            throw new InvalidFlagFormat("Not a number: " + input);
+            throw new InvalidFlagFormat("Значение можеть только номером: " + input);
         }
     }
 

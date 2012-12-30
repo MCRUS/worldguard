@@ -65,7 +65,7 @@ public class WorldGuardVehicleListener implements Listener {
             if (!plugin.getGlobalRegionManager().hasBypass(player, world)
                     && !set.canBuild(localPlayer)
                     && !set.allows(DefaultFlag.DESTROY_VEHICLE, localPlayer)) {
-                player.sendMessage(ChatColor.DARK_RED + "You don't have permission to destroy vehicles here.");
+                player.sendMessage(ChatColor.DARK_RED + "Вы не можете разбивать средства перемещения в данном регионе.");
                 event.setCancelled(true);
                 return;
             }
@@ -112,7 +112,7 @@ public class WorldGuardVehicleListener implements Listener {
 
                 boolean exitAllowed = set.allows(DefaultFlag.EXIT, localPlayer);
                 if (!hasBypass && exitAllowed && !state.lastExitAllowed) {
-                    player.sendMessage(ChatColor.DARK_RED + "You are not permitted to leave this area.");
+                    player.sendMessage(ChatColor.DARK_RED + "Вы не можете покидать данный регион.");
 
                     vehicle.setVelocity(new org.bukkit.util.Vector(0,0,0));
                     vehicle.teleport(event.getFrom());
@@ -142,7 +142,7 @@ public class WorldGuardVehicleListener implements Listener {
                         && state.notifiedForLeave != null && state.notifiedForLeave) {
                     plugin.broadcastNotification(ChatColor.GRAY + "WG: "
                             + ChatColor.LIGHT_PURPLE + player.getName()
-                            + ChatColor.GOLD + " left NOTIFY region");
+                            + ChatColor.GOLD + " покинул регион с оповещением");
                 }
 
                 if (notifyEnter != null && notifyEnter && (state.notifiedForEnter == null
@@ -158,7 +158,7 @@ public class WorldGuardVehicleListener implements Listener {
 
                     plugin.broadcastNotification(ChatColor.GRAY + "WG: "
                             + ChatColor.LIGHT_PURPLE + player.getName()
-                            + ChatColor.GOLD + " entered NOTIFY region: "
+                            + ChatColor.GOLD + " вошел в регион с оповещением: "
                             + ChatColor.WHITE
                             + regionList);
                 }

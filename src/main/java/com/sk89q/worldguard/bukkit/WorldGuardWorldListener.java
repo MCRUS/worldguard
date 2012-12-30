@@ -5,6 +5,7 @@
 */
 package com.sk89q.worldguard.bukkit;
 
+import com.sk89q.worldguard.util.StringUtil;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
@@ -47,7 +48,7 @@ public class WorldGuardWorldListener implements Listener {
             }
 
             if (removed > 50) {
-                plugin.getLogger().info("Halt-Act: " + removed + " entities (>50) auto-removed from "
+                plugin.getLogger().info("Блокировка активности: " + removed + " " + StringUtil.plural(removed, "моб", "моба", "мобов") + " (>50) было удалено в мире "
                         + event.getChunk().toString());
             }
         }

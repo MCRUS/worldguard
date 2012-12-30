@@ -212,7 +212,7 @@ public class WorldGuardPlugin extends JavaPlugin {
         try {
             commands.execute(cmd.getName(), args, sender, sender);
         } catch (CommandPermissionsException e) {
-            sender.sendMessage(ChatColor.RED + "You don't have permission.");
+            sender.sendMessage(ChatColor.RED + "У Вас недостаточно прав.");
         } catch (MissingNestedCommandException e) {
             sender.sendMessage(ChatColor.RED + e.getUsage());
         } catch (CommandUsageException e) {
@@ -220,9 +220,9 @@ public class WorldGuardPlugin extends JavaPlugin {
             sender.sendMessage(ChatColor.RED + e.getUsage());
         } catch (WrappedCommandException e) {
             if (e.getCause() instanceof NumberFormatException) {
-                sender.sendMessage(ChatColor.RED + "Number expected, string received instead.");
+                sender.sendMessage(ChatColor.RED + "Значение может быть только числовым.");
             } else {
-                sender.sendMessage(ChatColor.RED + "An error has occurred. See console.");
+                sender.sendMessage(ChatColor.RED + "Ошибка выполнения. Смотрите вывод в консоли.");
                 e.printStackTrace();
             }
         } catch (CommandException e) {
@@ -460,7 +460,7 @@ public class WorldGuardPlugin extends JavaPlugin {
             throws CommandException {
         // Check to see if there were any matches
         if (players.size() == 0) {
-            throw new CommandException("No players matched query.");
+            throw new CommandException("Игроки не найдены.");
         }
 
         return players;
@@ -485,7 +485,7 @@ public class WorldGuardPlugin extends JavaPlugin {
             throws CommandException {
 
         if (getServer().getOnlinePlayers().length == 0) {
-            throw new CommandException("No players matched query.");
+            throw new CommandException("Игроки не найдены.");
         }
 
         if (filter.equals("*")) {
@@ -528,7 +528,7 @@ public class WorldGuardPlugin extends JavaPlugin {
                 return checkPlayerMatch(players);
 
             } else {
-                throw new CommandException("Invalid group '" + filter + "'.");
+                throw new CommandException("Неверная группа '" + filter + "'.");
             }
         }
 
@@ -557,8 +557,8 @@ public class WorldGuardPlugin extends JavaPlugin {
         // players were found (we don't want to just pick off the first one,
         // as that may be the wrong player)
         if (players.hasNext()) {
-            throw new CommandException("More than one player found! " +
-                        "Use @<name> for exact matching.");
+            throw new CommandException("Найдено больше одного игрока! " +
+                        "Используйте @<имя> для точного поиска.");
         }
 
         return match;
@@ -630,7 +630,7 @@ public class WorldGuardPlugin extends JavaPlugin {
                     }
                 }
 
-                throw new CommandException("No normal world found.");
+                throw new CommandException("Стандартный мир не найден.");
 
             // #nether for the first nether world
             } else if (filter.equalsIgnoreCase("#nether")) {
@@ -640,7 +640,7 @@ public class WorldGuardPlugin extends JavaPlugin {
                     }
                 }
 
-                throw new CommandException("No nether world found.");
+                throw new CommandException("Ад не найден.");
 
             // Handle getting a world from a player
             } else if (filter.matches("^#player$")) {
@@ -648,12 +648,12 @@ public class WorldGuardPlugin extends JavaPlugin {
 
                 // They didn't specify an argument for the player!
                 if (parts.length == 1) {
-                    throw new CommandException("Argument expected for #player.");
+                    throw new CommandException("Не хватает значений #player.");
                 }
 
                 return matchPlayers(sender, parts[1]).iterator().next().getWorld();
             } else {
-                throw new CommandException("Invalid identifier '" + filter + "'.");
+                throw new CommandException("Не правильный идентификатор '" + filter + "'.");
             }
         }
 
@@ -663,7 +663,7 @@ public class WorldGuardPlugin extends JavaPlugin {
             }
         }
 
-        throw new CommandException("No world by that exact name found.");
+        throw new CommandException("Мир с таким именем не найден.");
     }
 
     /**
@@ -675,13 +675,13 @@ public class WorldGuardPlugin extends JavaPlugin {
     public WorldEditPlugin getWorldEdit() throws CommandException {
         Plugin worldEdit = getServer().getPluginManager().getPlugin("WorldEdit");
         if (worldEdit == null) {
-            throw new CommandException("WorldEdit does not appear to be installed.");
+            throw new CommandException("WorldEdit не установлен.");
         }
 
         if (worldEdit instanceof WorldEditPlugin) {
             return (WorldEditPlugin) worldEdit;
         } else {
-            throw new CommandException("WorldEdit detection failed (report error).");
+            throw new CommandException("Ошибка определения WorldEdit.");
         }
     }
 

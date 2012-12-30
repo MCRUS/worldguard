@@ -101,7 +101,7 @@ public class WorldGuardHangingListener implements Listener {
 
                 if (wcfg.useRegions) {
                     if (!plugin.getGlobalRegionManager().canBuild(player, hanging.getLocation())) {
-                        player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
+                        player.sendMessage(ChatColor.DARK_RED + "У Вас недостаточно прав в данном регионе.");
                         event.setCancelled(true);
                         return;
                     }
@@ -170,7 +170,7 @@ public class WorldGuardHangingListener implements Listener {
 
         if (wcfg.useRegions) {
             if (!plugin.getGlobalRegionManager().canBuild(player, placedOn.getLocation())) {
-                player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
+                player.sendMessage(ChatColor.DARK_RED + "У Вас недостаточно прав в данном регионе.");
                 event.setCancelled(true);
                 return;
             }
@@ -187,7 +187,7 @@ public class WorldGuardHangingListener implements Listener {
 
         if (wcfg.useRegions && (entity instanceof ItemFrame || entity instanceof Painting)) {
             if (!plugin.getGlobalRegionManager().canBuild(player, entity.getLocation())) {
-                player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
+                player.sendMessage(ChatColor.DARK_RED + "У Вас недостаточно прав в данном регионе.");
                 event.setCancelled(true);
                 return;
             }

@@ -66,9 +66,9 @@ public class WorldGuardCommandBookListener implements Listener {
                 }
                 
                 if (regions.size() > 0) {
-                    event.addWhoisInformation("Current Regions", regionStr);
+                    event.addWhoisInformation("Регионы которые тут размерещны", regionStr);
                 }
-                event.addWhoisInformation("Can build", regions.canBuild(localPlayer));
+                event.addWhoisInformation("Возможность стройки", regions.canBuild(localPlayer));
             }
         }
     }

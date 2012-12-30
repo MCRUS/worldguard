@@ -38,25 +38,25 @@ public class GeneralCommands {
     public GeneralCommands(WorldGuardPlugin plugin) {
         this.plugin = plugin;
     }
-    
+
     @SuppressWarnings("deprecation")
-    @Command(aliases = {"god"}, usage = "[player]",
-            desc = "Enable godmode on a player", flags = "s", max = 1)
+    @Command(aliases = {"god"}, usage = "[игрок]",
+            desc = "Включает режим бога для", flags = "s", max = 1)
     public void god(CommandContext args, CommandSender sender) throws CommandException {
         ConfigurationManager config = plugin.getGlobalStateManager();
-        
+
         Iterable<Player> targets = null;
         boolean included = false;
-        
+
         // Detect arguments based on the number of arguments provided
         if (args.argsLength() == 0) {
             targets = plugin.matchPlayers(plugin.checkPlayer(sender));
-            
+
             // Check permissions!
             plugin.checkPermission(sender, "worldguard.god");
-        } else if (args.argsLength() == 1) {            
+        } else if (args.argsLength() == 1) {
             targets = plugin.matchPlayers(sender, args.getString(0));
-            
+
             // Check permissions!
             plugin.checkPermission(sender, "worldguard.god.other");
         }
@@ -64,87 +64,87 @@ public class GeneralCommands {
         for (Player player : targets) {
             config.enableGodMode(player);
             player.setFireTicks(0);
-            
+
             // Tell the user
             if (player.equals(sender)) {
-                player.sendMessage(ChatColor.YELLOW + "God mode enabled! Use /ungod to disable.");
-                
+                player.sendMessage(ChatColor.YELLOW + "Режим бога включен! Используйте /ungod для отключения.");
+
                 // Keep track of this
                 included = true;
             } else {
-                player.sendMessage(ChatColor.YELLOW + "God enabled by "
+                player.sendMessage(ChatColor.YELLOW + "Режим бога включен игроком "
                         + plugin.toName(sender) + ".");
-                
+
             }
         }
-        
+
         // The player didn't receive any items, then we need to send the
         // user a message so s/he know that something is indeed working
         if (!included && args.hasFlag('s')) {
-            sender.sendMessage(ChatColor.YELLOW.toString() + "Players now have god mode.");
+            sender.sendMessage(ChatColor.YELLOW.toString() + "Все игроки теперь в режиме бога.");
         }
     }
-    
+
     @SuppressWarnings("deprecation")
-    @Command(aliases = {"ungod"}, usage = "[player]",
-            desc = "Disable godmode on a player", flags = "s", max = 1)
+    @Command(aliases = {"ungod"}, usage = "[игрок]",
+            desc = "Отключает режим бога", flags = "s", max = 1)
     public void ungod(CommandContext args, CommandSender sender) throws CommandException {
         ConfigurationManager config = plugin.getGlobalStateManager();
-        
+
         Iterable<Player> targets = null;
         boolean included = false;
-        
+
         // Detect arguments based on the number of arguments provided
         if (args.argsLength() == 0) {
             targets = plugin.matchPlayers(plugin.checkPlayer(sender));
-            
+
             // Check permissions!
             plugin.checkPermission(sender, "worldguard.god");
-        } else if (args.argsLength() == 1) {            
+        } else if (args.argsLength() == 1) {
             targets = plugin.matchPlayers(sender, args.getString(0));
-            
+
             // Check permissions!
             plugin.checkPermission(sender, "worldguard.god.other");
         }
 
         for (Player player : targets) {
             config.disableGodMode(player);
-            
+
             // Tell the user
             if (player.equals(sender)) {
-                player.sendMessage(ChatColor.YELLOW + "God mode disabled!");
-                
+                player.sendMessage(ChatColor.YELLOW + "Режим бога выключен!");
+
                 // Keep track of this
                 included = true;
             } else {
-                player.sendMessage(ChatColor.YELLOW + "God disabled by "
+                player.sendMessage(ChatColor.YELLOW + "Режим бога выключен игроком "
                         + plugin.toName(sender) + ".");
-                
+
             }
         }
-        
+
         // The player didn't receive any items, then we need to send the
         // user a message so s/he know that something is indeed working
         if (!included && args.hasFlag('s')) {
-            sender.sendMessage(ChatColor.YELLOW.toString() + "Players no longer have god mode.");
+            sender.sendMessage(ChatColor.YELLOW.toString() + "Режим бога выключен у всех игроков.");
         }
     }
-    
-    @Command(aliases = {"heal"}, usage = "[player]", desc = "Heal a player", flags = "s", max = 1)
-    public void heal(CommandContext args,CommandSender sender) throws CommandException {
-        
+
+    @Command(aliases = {"heal"}, usage = "[игрок]", desc = "Восстанавливает жизнь игрока", flags = "s", max = 1)
+    public void heal(CommandContext args, CommandSender sender) throws CommandException {
+
         Iterable<Player> targets = null;
         boolean included = false;
-        
+
         // Detect arguments based on the number of arguments provided
         if (args.argsLength() == 0) {
             targets = plugin.matchPlayers(plugin.checkPlayer(sender));
-            
+
             // Check permissions!
             plugin.checkPermission(sender, "worldguard.heal");
-        } else if (args.argsLength() == 1) {            
+        } else if (args.argsLength() == 1) {
             targets = plugin.matchPlayers(sender, args.getString(0));
-            
+
             // Check permissions!
             plugin.checkPermission(sender, "worldguard.heal.other");
         }
@@ -152,100 +152,100 @@ public class GeneralCommands {
         for (Player player : targets) {
             player.setHealth(20);
             player.setFoodLevel(20);
-            
+
             // Tell the user
             if (player.equals(sender)) {
-                player.sendMessage(ChatColor.YELLOW + "Healed!");
-                
+                player.sendMessage(ChatColor.YELLOW + "Жизнь восстановлена!");
+
                 // Keep track of this
                 included = true;
             } else {
-                player.sendMessage(ChatColor.YELLOW + "Healed by "
+                player.sendMessage(ChatColor.YELLOW + "Ваша жизнь восстановлена игроком "
                         + plugin.toName(sender) + ".");
-                
+
             }
         }
-        
+
         // The player didn't receive any items, then we need to send the
         // user a message so s/he know that something is indeed working
         if (!included && args.hasFlag('s')) {
-            sender.sendMessage(ChatColor.YELLOW.toString() + "Players healed.");
+            sender.sendMessage(ChatColor.YELLOW.toString() + "Жизнь всх игроков восстановлена.");
         }
     }
-    
-    @Command(aliases = {"slay"}, usage = "[player]", desc = "Slay a player", flags = "s", max = 1)
+
+    @Command(aliases = {"slay"}, usage = "[игрок]", desc = "Убивает игрока", flags = "s", max = 1)
     public void slay(CommandContext args, CommandSender sender) throws CommandException {
-        
+
         Iterable<Player> targets = null;
         boolean included = false;
-        
+
         // Detect arguments based on the number of arguments provided
         if (args.argsLength() == 0) {
             targets = plugin.matchPlayers(plugin.checkPlayer(sender));
-            
+
             // Check permissions!
             plugin.checkPermission(sender, "worldguard.slay");
-        } else if (args.argsLength() == 1) {            
+        } else if (args.argsLength() == 1) {
             targets = plugin.matchPlayers(sender, args.getString(0));
-            
+
             // Check permissions!
             plugin.checkPermission(sender, "worldguard.slay.other");
         }
 
         for (Player player : targets) {
             player.setHealth(0);
-            
+
             // Tell the user
             if (player.equals(sender)) {
-                player.sendMessage(ChatColor.YELLOW + "Slain!");
-                
+                player.sendMessage(ChatColor.YELLOW + "Вы умерли!");
+
                 // Keep track of this
                 included = true;
             } else {
-                player.sendMessage(ChatColor.YELLOW + "Slain by "
+                player.sendMessage(ChatColor.YELLOW + "Вы были убиты игроком "
                         + plugin.toName(sender) + ".");
-                
+
             }
         }
-        
+
         // The player didn't receive any items, then we need to send the
         // user a message so s/he know that something is indeed working
         if (!included && args.hasFlag('s')) {
-            sender.sendMessage(ChatColor.YELLOW.toString() + "Players slain.");
+            sender.sendMessage(ChatColor.YELLOW.toString() + "Все игроки убиты.");
         }
     }
-    
-    @Command(aliases = {"locate"}, usage = "[player]", desc = "Locate a player", max = 1)
+
+    @Command(aliases = {"locate"}, usage = "[игрок]", desc = "Указывает место игрока", max = 1)
     @CommandPermissions({"worldguard.locate"})
     public void locate(CommandContext args, CommandSender sender) throws CommandException {
-        
+
         Player player = plugin.checkPlayer(sender);
-        
+
         if (args.argsLength() == 0) {
             player.setCompassTarget(player.getWorld().getSpawnLocation());
-            
-            sender.sendMessage(ChatColor.YELLOW.toString() + "Compass reset to spawn.");
+
+            sender.sendMessage(ChatColor.YELLOW.toString() + "Компас теперь указывает на спавн.");
         } else {
             Player target = plugin.matchSinglePlayer(sender, args.getString(0));
             player.setCompassTarget(target.getLocation());
-            
-            sender.sendMessage(ChatColor.YELLOW.toString() + "Compass repointed.");
+
+            sender.sendMessage(ChatColor.YELLOW.toString() + "Компас перенастроен.");
         }
     }
-    
-    @Command(aliases = {"stack", ";"}, usage = "", desc = "Stack items", max = 0)
+
+    @Command(aliases = {"stack", ";"}, usage = "", desc = "Стакирует предметы", max = 0)
     @CommandPermissions({"worldguard.stack"})
     public void stack(CommandContext args, CommandSender sender) throws CommandException {
-        
+
         Player player = plugin.checkPlayer(sender);
         boolean ignoreMax = plugin.hasPermission(player, "worldguard.stack.illegitimate");
         boolean ignoreDamaged = plugin.hasPermission(player, "worldguard.stack.damaged");
-        
+
         ItemStack[] items = player.getInventory().getContents();
         int len = items.length;
 
         int affected = 0;
-        
+
         for (int i = 0; i < len; i++) {
             ItemStack item = items[i];
 
@@ -281,7 +281,7 @@ public class GeneralCommands {
                             item.setAmount(max);
                             item2.setAmount(item2.getAmount() - needed);
                             break;
-                        // This stack will
+                            // This stack will
                         } else {
                             items[j] = null;
                             item.setAmount(item.getAmount() + item2.getAmount());
@@ -298,6 +298,6 @@ public class GeneralCommands {
             player.getInventory().setContents(items);
         }
 
-        player.sendMessage(ChatColor.YELLOW + "Items compacted into stacks!");
+        player.sendMessage(ChatColor.YELLOW + "Предметы были собраны в стаки!");
     }
 }

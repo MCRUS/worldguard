@@ -103,7 +103,7 @@ public class WorldGuardBlockListener implements Listener {
         // handle them a bit separately
         if (blockDamaged.getTypeId() == BlockID.CAKE_BLOCK) {
             if (!plugin.getGlobalRegionManager().canBuild(player, blockDamaged)) {
-                player.sendMessage(ChatColor.DARK_RED + "You're not invited to this tea party!");
+                player.sendMessage(ChatColor.DARK_RED + "Вы не приглашены на эту чайную вечеринку!");
                 event.setCancelled(true);
                 return;
             }
@@ -130,7 +130,7 @@ public class WorldGuardBlockListener implements Listener {
 
         if (!plugin.getGlobalRegionManager().canBuild(player, event.getBlock())
          || !plugin.getGlobalRegionManager().canConstruct(player, event.getBlock())) {
-            player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
+            player.sendMessage(ChatColor.DARK_RED + "Вы не можете разбивать блоки на этой территории.");
             event.setCancelled(true);
             return;
         }
@@ -154,7 +154,7 @@ public class WorldGuardBlockListener implements Listener {
         }
 
         if (wcfg.isChestProtected(event.getBlock(), player)) {
-            player.sendMessage(ChatColor.DARK_RED + "The chest is protected.");
+            player.sendMessage(ChatColor.DARK_RED + "Сундук защищен.");
             event.setCancelled(true);
             return;
         }
@@ -481,7 +481,7 @@ public class WorldGuardBlockListener implements Listener {
             final Location location = blockPlaced.getLocation();
             if (!plugin.getGlobalRegionManager().canBuild(player, location)
              || !plugin.getGlobalRegionManager().canConstruct(player, location)) {
-                player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
+                player.sendMessage(ChatColor.DARK_RED + "Вы не можете размещать блоки на этой территории.");
                 event.setCancelled(true);
                 return;
             }
@@ -498,7 +498,7 @@ public class WorldGuardBlockListener implements Listener {
 
         if (wcfg.signChestProtection && wcfg.getChestProtection().isChest(blockPlaced.getTypeId())) {
             if (wcfg.isAdjacentChestProtected(event.getBlock(), player)) {
-                player.sendMessage(ChatColor.DARK_RED + "This spot is for a chest that you don't have permission for.");
+                player.sendMessage(ChatColor.DARK_RED + "Вы не можете размещать тут сундук.");
                 event.setCancelled(true);
                 return;
             }
@@ -563,7 +563,7 @@ public class WorldGuardBlockListener implements Listener {
         if (wcfg.signChestProtection) {
             if (event.getLine(0).equalsIgnoreCase("[Lock]")) {
                 if (wcfg.isChestProtectedPlacement(event.getBlock(), player)) {
-                    player.sendMessage(ChatColor.DARK_RED + "You do not own the adjacent chest.");
+                    player.sendMessage(ChatColor.DARK_RED + "Вы не владелец данного сундука.");
                     event.getBlock().breakNaturally();
                     event.setCancelled(true);
                     return;
@@ -571,7 +571,7 @@ public class WorldGuardBlockListener implements Listener {
 
                 if (event.getBlock().getTypeId() != BlockID.SIGN_POST) {
                     player.sendMessage(ChatColor.RED
-                            + "The [Lock] sign must be a sign post, not a wall sign.");
+                            + "Табличка [Lock] должна быть создана на сундуке, а не на стене.");
 
                     event.getBlock().breakNaturally();
                     event.setCancelled(true);
@@ -580,7 +580,7 @@ public class WorldGuardBlockListener implements Listener {
 
                 if (!event.getLine(1).equalsIgnoreCase(player.getName())) {
                     player.sendMessage(ChatColor.RED
-                            + "The first owner line must be your name.");
+                            + "На первой линии должно быть написано Ваше имя.");
 
                     event.getBlock().breakNaturally();
                     event.setCancelled(true);
@@ -592,7 +592,7 @@ public class WorldGuardBlockListener implements Listener {
                 if (below == BlockID.TNT || below == BlockID.SAND
                         || below == BlockID.GRAVEL || below == BlockID.SIGN_POST) {
                     player.sendMessage(ChatColor.RED
-                            + "That is not a safe block that you're putting this sign on.");
+                            + "Мы не можете защититьданный блок. Он не безопастный.");
 
                     event.getBlock().breakNaturally();
                     event.setCancelled(true);
@@ -601,12 +601,12 @@ public class WorldGuardBlockListener implements Listener {
 
                 event.setLine(0, "[Lock]");
                 player.sendMessage(ChatColor.YELLOW
-                        + "A chest or double chest above is now protected.");
+                        + "Данный сундук теперь защищен.");
             }
         } else if (!wcfg.disableSignChestProtectionCheck) {
             if (event.getLine(0).equalsIgnoreCase("[Lock]")) {
                 player.sendMessage(ChatColor.RED
-                        + "WorldGuard's sign chest protection is disabled.");
+                        + "Защите с помощью табличке отключена в WorldGuard.");
 
                 event.getBlock().breakNaturally();
                 event.setCancelled(true);
@@ -615,7 +615,7 @@ public class WorldGuardBlockListener implements Listener {
         }
 
         if (!plugin.getGlobalRegionManager().canBuild(player, event.getBlock())) {
-            player.sendMessage(ChatColor.DARK_RED + "You don't have permission for this area.");
+            player.sendMessage(ChatColor.DARK_RED + "У Вас нет прав на данной территории.");
             event.setCancelled(true);
             return;
         }

@@ -45,15 +45,17 @@ public class WorldGuardCommands {
         this.plugin = plugin;
     }
 
-    @Command(aliases = {"version"}, desc = "Get the WorldGuard version", max = 0)
+    @Command(aliases = {"version"}, desc = "Выводит версию WorldGuard", max = 0)
     public void version(CommandContext args, CommandSender sender) throws CommandException {
         sender.sendMessage(ChatColor.YELLOW
                 + "WorldGuard " + plugin.getDescription().getVersion());
         sender.sendMessage(ChatColor.YELLOW
                 + "http://www.sk89q.com");
+        sender.sendMessage(ChatColor.YELLOW
+                + "Перевод Alex Bond");
     }
 
-    @Command(aliases = {"reload"}, desc = "Reload WorldGuard configuration", max = 0)
+    @Command(aliases = {"reload"}, desc = "Перезагружает конфигурацию WorldGuard", max = 0)
     @CommandPermissions({"worldguard.reload"})
     public void reload(CommandContext args, CommandSender sender) throws CommandException {
         
@@ -72,9 +74,9 @@ public class WorldGuardCommands {
             plugin.getGlobalRegionManager().unload();
             plugin.getGlobalStateManager().load();
             plugin.getGlobalRegionManager().preload();
-            sender.sendMessage("WorldGuard configuration reloaded.");
+            sender.sendMessage("Конфигурация WorldGuard перезагружена.");
         } catch (Throwable t) {
-            sender.sendMessage("Error while reloading: "
+            sender.sendMessage("Ошибка перезагрузки WorldGuard: "
                     + t.getMessage());
         } finally {
             if (minecraftLogger != null) {
@@ -83,7 +85,7 @@ public class WorldGuardCommands {
         }
     }
     
-    @Command(aliases = {"report"}, desc = "Writes a report on WorldGuard", flags = "p", max = 0)
+    @Command(aliases = {"report"}, desc = "Отсылает отчет об ошибке WorldGuard", flags = "p", max = 0)
     @CommandPermissions({"worldguard.report"})
     public void report(CommandContext args, final CommandSender sender) throws CommandException {
         
@@ -92,26 +94,26 @@ public class WorldGuardCommands {
         
         try {
             report.write(dest);
-            sender.sendMessage(ChatColor.YELLOW + "WorldGuard report written to "
+            sender.sendMessage(ChatColor.YELLOW + "Отчет WorldGuard был сохранен в файл "
                     + dest.getAbsolutePath());
         } catch (IOException e) {
-            throw new CommandException("Failed to write report: " + e.getMessage());
+            throw new CommandException("Ошибка записи файла: " + e.getMessage());
         }
         
         if (args.hasFlag('p')) {
             plugin.checkPermission(sender, "worldguard.report.pastebin");
             
-            sender.sendMessage(ChatColor.YELLOW + "Now uploading to Pastebin...");
+            sender.sendMessage(ChatColor.YELLOW + "Загружаю на Pastebin...");
             PastebinPoster.paste(report.toString(), new PasteCallback() {
                 
                 public void handleSuccess(String url) {
                     // Hope we don't have a thread safety issue here
-                    sender.sendMessage(ChatColor.YELLOW + "WorldGuard report (1 hour): " + url);
+                    sender.sendMessage(ChatColor.YELLOW + "Отчет WorldGuard был загружен: " + url);
                 }
                 
                 public void handleError(String err) {
                     // Hope we don't have a thread safety issue here
-                    sender.sendMessage(ChatColor.YELLOW + "WorldGuard report pastebin error: " + err);
+                    sender.sendMessage(ChatColor.YELLOW + "Ошибка загрузки отчета WorldGuard на Pastebin: " + err);
                 }
             });
         }
@@ -119,17 +121,17 @@ public class WorldGuardCommands {
     }
 
     @Command(aliases = {"flushstates", "clearstates"},
-            usage = "[player]", desc = "Flush the state manager", max = 1)
+            usage = "[игрок]", desc = "Сбрасывает состояние менеджера", max = 1)
     @CommandPermissions("worldguard.flushstates")
     public void flushStates(CommandContext args, CommandSender sender) throws CommandException {
         if (args.argsLength() == 0) {
             plugin.getFlagStateManager().forgetAll();
-            sender.sendMessage("Cleared all states.");
+            sender.sendMessage("Все состояния сброшены.");
         } else {
             Player player = plugin.getServer().getPlayer(args.getString(0));
             if (player != null) {
                 plugin.getFlagStateManager().forget(player);
-                sender.sendMessage("Cleared states for player \"" + player.getName() + "\".");
+                sender.sendMessage("Все стсояния игрока \"" + player.getName() + "\" сброшены.");
             }
         }
     }
