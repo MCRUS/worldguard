@@ -613,7 +613,7 @@ public class WorldGuardPlayerListener implements Listener {
                         }
                     }
 
-                    player.sendMessage(ChatColor.YELLOW + "Размещенные сдесь регионы: " + str.toString());
+                    player.sendMessage(ChatColor.YELLOW + "Размещенные здесь регионы: " + str.toString());
                 } else {
                     player.sendMessage(ChatColor.YELLOW + "WorldGuard: Регионы не найдены!");
                 }
