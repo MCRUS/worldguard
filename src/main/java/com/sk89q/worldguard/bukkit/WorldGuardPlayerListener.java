@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import com.sk89q.worldguard.util.StringUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
