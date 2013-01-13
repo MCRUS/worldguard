@@ -19,7 +19,23 @@
 
 package com.sk89q.worldguard.bukkit.commands;
 
-import com.sk89q.minecraft.util.commands.*;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import org.bukkit.ChatColor;
+import org.bukkit.World;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+
+import com.sk89q.minecraft.util.commands.Command;
+import com.sk89q.minecraft.util.commands.CommandContext;
+import com.sk89q.minecraft.util.commands.CommandException;
+import com.sk89q.minecraft.util.commands.CommandPermissions;
+import com.sk89q.minecraft.util.commands.CommandPermissionsException;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.Location;
 import com.sk89q.worldedit.Vector;
@@ -38,27 +54,24 @@ import com.sk89q.worldguard.protection.databases.RegionDBUtil;
 import com.sk89q.worldguard.protection.databases.migrators.AbstractDatabaseMigrator;
 import com.sk89q.worldguard.protection.databases.migrators.MigrationException;
 import com.sk89q.worldguard.protection.databases.migrators.MigratorKey;
-import com.sk89q.worldguard.protection.flags.*;
+import com.sk89q.worldguard.protection.flags.DefaultFlag;
+import com.sk89q.worldguard.protection.flags.Flag;
+import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
+import com.sk89q.worldguard.protection.flags.RegionGroup;
+import com.sk89q.worldguard.protection.flags.RegionGroupFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.GlobalProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion.CircularInheritanceException;
-import org.bukkit.ChatColor;
-import org.bukkit.World;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
-import java.lang.reflect.InvocationTargetException;
-import java.util.*;
 
 public class RegionCommands {
     private final WorldGuardPlugin plugin;
 
     private MigratorKey migrateDBRequest;
     private Date migrateDBRequestDate;
-
+    
     public RegionCommands(WorldGuardPlugin plugin) {
         this.plugin = plugin;
     }
@@ -67,31 +80,31 @@ public class RegionCommands {
             desc = "Определяет регион", min = 1)
     @CommandPermissions({"worldguard.region.define"})
     public void define(CommandContext args, CommandSender sender) throws CommandException {
-
+        
         Player player = plugin.checkPlayer(sender);
         WorldEditPlugin worldEdit = plugin.getWorldEdit();
         String id = args.getString(0);
-
+        
         if (!ProtectedRegion.isValidId(id)) {
             throw new CommandException("Указан не правильный ID региона!");
         }
-
+        
         if (id.equalsIgnoreCase("__global__")) {
             throw new CommandException("Регион не может быть назван __global__");
         }
-
+        
         // Attempt to get the player's selection from WorldEdit
         Selection sel = worldEdit.getSelection(player);
-
+        
         if (sel == null) {
             throw new CommandException("Сначала выделите регион с помощью WorldEdit.");
         }
-
+        
         RegionManager mgr = plugin.getGlobalRegionManager().get(sel.getWorld());
         if (mgr.hasRegion(id)) {
             throw new CommandException("Такой регион уже существует. Для переназначения используйте redefine.");
         }
-
+        
         ProtectedRegion region;
 
         // Detect the type of region from WorldEdit
@@ -113,9 +126,9 @@ public class RegionCommands {
         if (args.argsLength() > 1) {
             region.setOwners(RegionDBUtil.parseDomainString(args.getSlice(1), 1));
         }
-
+        
         mgr.addRegion(region);
-
+        
         try {
             mgr.save();
             sender.sendMessage(ChatColor.YELLOW + "Редин сохранен как " + id + ".");
@@ -124,17 +137,17 @@ public class RegionCommands {
                     + e.getMessage());
         }
     }
-
+    
     @Command(aliases = {"redefine", "update", "move"}, usage = "<id>",
             desc = "Переопределяет регион", min = 1, max = 1)
     public void redefine(CommandContext args, CommandSender sender) throws CommandException {
-
+        
         Player player = plugin.checkPlayer(sender);
         World world = player.getWorld();
         WorldEditPlugin worldEdit = plugin.getWorldEdit();
         LocalPlayer localPlayer = plugin.wrapPlayer(player);
         String id = args.getString(0);
-
+        
         if (id.equalsIgnoreCase("__global__")) {
             throw new CommandException("Регион __global__ нельзя переопределить");
         }
