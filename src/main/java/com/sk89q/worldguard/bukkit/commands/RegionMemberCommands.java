@@ -30,11 +30,11 @@ import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.domains.DefaultDomain;
+import com.sk89q.worldguard.protection.databases.ProtectionDatabaseException;
+import com.sk89q.worldguard.protection.databases.RegionDBUtil;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import com.sk89q.worldguard.protection.databases.ProtectionDatabaseException;
-import com.sk89q.worldguard.protection.databases.RegionDBUtil;
 
 // @TODO: A lot of code duplication here! Need to fix.
 
@@ -45,14 +45,23 @@ public class RegionMemberCommands {
         this.plugin = plugin;
     }
     
-    @Command(aliases = {"addmember", "addmember"}, usage = "<id> <игроки...>",
-            desc = "Добавляет учасника(ов) в заданый регион", min = 2)
+    @Command(aliases = {"addmember", "addmember"},
+            usage = "<id> <игроки...>",
+            flags = "w:",
+            desc = "Добавляет учасника(ов) в заданый регион", 
+            min = 2)
     public void addMember(CommandContext args, CommandSender sender) throws CommandException {
-        
-        Player player = plugin.checkPlayer(sender);
-        World world = player.getWorld();
-        LocalPlayer localPlayer = plugin.wrapPlayer(player);
-        
+        final World world;
+        Player player;
+        LocalPlayer localPlayer = null;
+        if (args.hasFlag('w')) {
+            world = plugin.matchWorld(sender, args.getFlag('w'));
+        } else {
+            player = plugin.checkPlayer(sender);
+            localPlayer = plugin.wrapPlayer(player);
+            world = player.getWorld();
+        }
+
         String id = args.getString(0);
 
         RegionManager mgr = plugin.getGlobalRegionManager().get(world);
@@ -64,12 +73,14 @@ public class RegionMemberCommands {
 
         id = region.getId();
 
-        if (region.isOwner(localPlayer)) {
-            plugin.checkPermission(sender, "worldguard.region.addmember.own." + id.toLowerCase());
-        } else if (region.isMember(localPlayer)) {
-            plugin.checkPermission(sender, "worldguard.region.addmember.member." + id.toLowerCase());
-        } else {
-            plugin.checkPermission(sender, "worldguard.region.addmember." + id.toLowerCase());
+        if (localPlayer != null) {
+            if (region.isOwner(localPlayer)) {
+                plugin.checkPermission(sender, "worldguard.region.addmember.own." + id.toLowerCase());
+            } else if (region.isMember(localPlayer)) {
+                plugin.checkPermission(sender, "worldguard.region.addmember.member." + id.toLowerCase());
+            } else {
+                plugin.checkPermission(sender, "worldguard.region.addmember." + id.toLowerCase());
+            }
         }
 
         RegionDBUtil.addToDomain(region.getMembers(), args.getPaddedSlice(2, 0), 0);
@@ -85,14 +96,22 @@ public class RegionMemberCommands {
         }
     }
     
-    @Command(aliases = {"addowner", "addowner"}, usage = "<id> <игроки...>",
+    @Command(aliases = {"addowner", "addowner"}, 
+            usage = "<id> <игроки...>",
+            flags = "w:",
             desc = "Добавляет владельца(ов) в регион", min = 2)
     public void addOwner(CommandContext args, CommandSender sender) throws CommandException {
-        
-        Player player = plugin.checkPlayer(sender);
-        World world = player.getWorld();
-        LocalPlayer localPlayer = plugin.wrapPlayer(player);
-        
+        final World world;
+        Player player = null;
+        LocalPlayer localPlayer = null;
+        if (args.hasFlag('w')) {
+            world = plugin.matchWorld(sender, args.getFlag('w'));
+        } else {
+            player = plugin.checkPlayer(sender);
+            localPlayer = plugin.wrapPlayer(player);
+            world = player.getWorld();
+        }
+
         String id = args.getString(0);
 
         RegionManager mgr = plugin.getGlobalRegionManager().get(world);
@@ -106,22 +125,24 @@ public class RegionMemberCommands {
 
         Boolean flag = region.getFlag(DefaultFlag.BUYABLE);
         DefaultDomain owners = region.getOwners();
-        if (flag != null && flag && owners != null && owners.size() == 0) {
-            if (!plugin.hasPermission(player, "worldguard.region.unlimited")) {
-                int maxRegionCount = plugin.getGlobalStateManager().get(world).getMaxRegionCount(player);
-                if (maxRegionCount >= 0 && mgr.getRegionCountOfPlayer(localPlayer)
-                        >= maxRegionCount) {
-                    throw new CommandException("You already own the maximum allowed amount of regions.");
+        if (localPlayer != null) {
+            if (flag != null && flag && owners != null && owners.size() == 0) {
+                if (!plugin.hasPermission(player, "worldguard.region.unlimited")) {
+                    int maxRegionCount = plugin.getGlobalStateManager().get(world).getMaxRegionCount(player);
+                    if (maxRegionCount >= 0 && mgr.getRegionCountOfPlayer(localPlayer)
+                            >= maxRegionCount) {
+                        throw new CommandException("You already own the maximum allowed amount of regions.");
+                    }
                 }
-            }
-            plugin.checkPermission(sender, "worldguard.region.addowner.unclaimed." + id.toLowerCase());
-        } else {
-            if (region.isOwner(localPlayer)) {
-                plugin.checkPermission(sender, "worldguard.region.addowner.own." + id.toLowerCase());
-            } else if (region.isMember(localPlayer)) {
-                plugin.checkPermission(sender, "worldguard.region.addowner.member." + id.toLowerCase());
+                plugin.checkPermission(sender, "worldguard.region.addowner.unclaimed." + id.toLowerCase());
             } else {
-                plugin.checkPermission(sender, "worldguard.region.addowner." + id.toLowerCase());
+                if (region.isOwner(localPlayer)) {
+                    plugin.checkPermission(sender, "worldguard.region.addowner.own." + id.toLowerCase());
+                } else if (region.isMember(localPlayer)) {
+                    plugin.checkPermission(sender, "worldguard.region.addowner.member." + id.toLowerCase());
+                } else {
+                    plugin.checkPermission(sender, "worldguard.region.addowner." + id.toLowerCase());
+                }
             }
         }
 
@@ -138,14 +159,23 @@ public class RegionMemberCommands {
         }
     }
     
-    @Command(aliases = {"removemember", "remmember", "removemem", "remmem"}, usage = "<id> <игроки...>",
-            desc = "Убирает учасника(ов) из региона", min = 2)
+    @Command(aliases = {"removemember", "remmember", "removemem", "remmem"},
+            usage = "<id> <игроки...>",
+            flags = "w:",
+            desc = "Убирает учасника(ов) из региона",
+            min = 2)
     public void removeMember(CommandContext args, CommandSender sender) throws CommandException {
-        
-        Player player = plugin.checkPlayer(sender);
-        World world = player.getWorld();
-        LocalPlayer localPlayer = plugin.wrapPlayer(player);
-        
+        final World world;
+        Player player;
+        LocalPlayer localPlayer = null;
+        if (args.hasFlag('w')) {
+            world = plugin.matchWorld(sender, args.getFlag('w'));
+        } else {
+            player = plugin.checkPlayer(sender);
+            localPlayer = plugin.wrapPlayer(player);
+            world = player.getWorld();
+        }
+
         String id = args.getString(0);
 
         RegionManager mgr = plugin.getGlobalRegionManager().get(world);
@@ -157,12 +187,14 @@ public class RegionMemberCommands {
 
         id = region.getId();
 
-        if (region.isOwner(localPlayer)) {
-            plugin.checkPermission(sender, "worldguard.region.removemember.own." + id.toLowerCase());
-        } else if (region.isMember(localPlayer)) {
-            plugin.checkPermission(sender, "worldguard.region.removemember.member." + id.toLowerCase());
-        } else {
-            plugin.checkPermission(sender, "worldguard.region.removemember." + id.toLowerCase());
+        if (localPlayer != null) {
+            if (region.isOwner(localPlayer)) {
+                plugin.checkPermission(sender, "worldguard.region.removemember.own." + id.toLowerCase());
+            } else if (region.isMember(localPlayer)) {
+                plugin.checkPermission(sender, "worldguard.region.removemember.member." + id.toLowerCase());
+            } else {
+                plugin.checkPermission(sender, "worldguard.region.removemember." + id.toLowerCase());
+            }
         }
 
         RegionDBUtil.removeFromDomain(region.getMembers(), args.getPaddedSlice(2, 0), 0);
@@ -178,15 +210,24 @@ public class RegionMemberCommands {
         }
     }
     
-    @Command(aliases = {"removeowner", "remowner"}, usage = "<id> <игроки...>",
-            desc = "Убирает владельца(ов) из региона", min = 2)
+    @Command(aliases = {"removeowner", "remowner"},
+            usage = "<id> <игроки...>",
+            flags = "w:",
+            desc = "Убирает владельца(ов) из региона",
+            min = 2)
     public void removeOwner(CommandContext args,
             CommandSender sender) throws CommandException {
-        
-        Player player = plugin.checkPlayer(sender);
-        World world = player.getWorld();
-        LocalPlayer localPlayer = plugin.wrapPlayer(player);
-        
+        final World world;
+        Player player;
+        LocalPlayer localPlayer = null;
+        if (args.hasFlag('w')) {
+            world = plugin.matchWorld(sender, args.getFlag('w'));
+        } else {
+            player = plugin.checkPlayer(sender);
+            localPlayer = plugin.wrapPlayer(player);
+            world = player.getWorld();
+        }
+
         String id = args.getString(0);
 
         RegionManager mgr = plugin.getGlobalRegionManager().get(world);
@@ -198,12 +239,14 @@ public class RegionMemberCommands {
 
         id = region.getId();
 
-        if (region.isOwner(localPlayer)) {
-            plugin.checkPermission(sender, "worldguard.region.removeowner.own." + id.toLowerCase());
-        } else if (region.isMember(localPlayer)) {
-            plugin.checkPermission(sender, "worldguard.region.removeowner.member." + id.toLowerCase());
-        } else {
-            plugin.checkPermission(sender, "worldguard.region.removeowner." + id.toLowerCase());
+        if (localPlayer != null) {
+            if (region.isOwner(localPlayer)) {
+                plugin.checkPermission(sender, "worldguard.region.removeowner.own." + id.toLowerCase());
+            } else if (region.isMember(localPlayer)) {
+                plugin.checkPermission(sender, "worldguard.region.removeowner.member." + id.toLowerCase());
+            } else {
+                plugin.checkPermission(sender, "worldguard.region.removeowner." + id.toLowerCase());
+            }
         }
 
         RegionDBUtil.removeFromDomain(region.getOwners(), args.getPaddedSlice(2, 0), 0);
