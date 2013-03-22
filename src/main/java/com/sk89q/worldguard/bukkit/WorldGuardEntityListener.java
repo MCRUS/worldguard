@@ -31,7 +31,24 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.entity.*;
+import org.bukkit.entity.Creature;
+import org.bukkit.entity.Creeper;
+import org.bukkit.entity.EnderDragon;
+import org.bukkit.entity.EnderPearl;
+import org.bukkit.entity.Enderman;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Fireball;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Minecart;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.entity.TNTPrimed;
+import org.bukkit.entity.Tameable;
+import org.bukkit.entity.ThrownPotion;
+import org.bukkit.entity.Wither;
+import org.bukkit.entity.WitherSkull;
+import org.bukkit.entity.Wolf;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -566,7 +583,7 @@ public class WorldGuardEntityListener implements Listener {
                     }
                 }
             }
-        } else if (ent instanceof TNTPrimed || ent.getType() == tntMinecartType) {
+        } else if (ent instanceof TNTPrimed || (ent != null && ent.getType() == tntMinecartType)) {
             if (wcfg.blockTNTBlockDamage) {
                 event.blockList().clear();
                 return;
@@ -697,7 +714,8 @@ public class WorldGuardEntityListener implements Listener {
                 event.setCancelled(true);
                 return;
             }
-        } else if (event.getEntityType() == EntityType.PRIMED_TNT) {
+        } else if (event.getEntityType() == EntityType.PRIMED_TNT
+                || event.getEntityType() == tntMinecartType) {
             if (wcfg.blockTNTExplosions) {
                 event.setCancelled(true);
                 return;
