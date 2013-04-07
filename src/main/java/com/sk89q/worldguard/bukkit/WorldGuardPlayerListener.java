@@ -602,10 +602,6 @@ public class WorldGuardPlayerListener implements Listener {
      * @param event Thrown event
      */
     private void handleAirRightClick(PlayerInteractEvent event) {
-        if (event.isCancelled()) {
-            return;
-        }
-
         Player player = event.getPlayer();
         World world = player.getWorld();
         ItemStack item = player.getItemInHand();
@@ -777,7 +773,7 @@ public class WorldGuardPlayerListener implements Listener {
 
             if (item.getTypeId() == ItemID.FIRE_CHARGE || item.getTypeId() == ItemID.FLINT_AND_TINDER) {
                 if (!plugin.getGlobalRegionManager().hasBypass(localPlayer, world)
-                        && !placedInSet.canBuild(localPlayer)) {
+                        && !placedInSet.allows(DefaultFlag.LIGHTER, localPlayer)) {
                     event.setCancelled(true);
                     event.setUseItemInHand(Result.DENY);
                     player.sendMessage(ChatColor.DARK_RED + "You're not allowed to use that here.");
