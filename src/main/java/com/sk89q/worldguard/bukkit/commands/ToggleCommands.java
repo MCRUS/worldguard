@@ -128,7 +128,7 @@ public class ToggleCommands {
 
                 if (removed > 10) {
                     sender.sendMessage("" + removed + " мобов (>10) было удалено в мире "
-                            + world.toString());
+                            + world.getName());
                 }
             }
 

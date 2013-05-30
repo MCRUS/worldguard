@@ -52,14 +52,20 @@ public class RegionMemberCommands {
             min = 2)
     public void addMember(CommandContext args, CommandSender sender) throws CommandException {
         final World world;
-        Player player;
+        Player player = null;
         LocalPlayer localPlayer = null;
+        if (sender instanceof Player) {
+            player = (Player) sender;
+            localPlayer = plugin.wrapPlayer(player);
+        }
         if (args.hasFlag('w')) {
             world = plugin.matchWorld(sender, args.getFlag('w'));
         } else {
-            player = plugin.checkPlayer(sender);
-            localPlayer = plugin.wrapPlayer(player);
-            world = player.getWorld();
+            if (player != null) {
+                world = player.getWorld();
+            } else {
+                throw new CommandException("No world specified. Use -w <worldname>.");
+            }
         }
 
         String id = args.getString(0);
@@ -104,12 +110,18 @@ public class RegionMemberCommands {
         final World world;
         Player player = null;
         LocalPlayer localPlayer = null;
+        if (sender instanceof Player) {
+            player = (Player) sender;
+            localPlayer = plugin.wrapPlayer(player);
+        }
         if (args.hasFlag('w')) {
             world = plugin.matchWorld(sender, args.getFlag('w'));
         } else {
-            player = plugin.checkPlayer(sender);
-            localPlayer = plugin.wrapPlayer(player);
-            world = player.getWorld();
+            if (player != null) {
+                world = player.getWorld();
+            } else {
+                throw new CommandException("No world specified. Use -w <worldname>.");
+            }
         }
 
         String id = args.getString(0);
@@ -161,19 +173,25 @@ public class RegionMemberCommands {
     
     @Command(aliases = {"removemember", "remmember", "removemem", "remmem"},
             usage = "<id> <игроки...>",
-            flags = "w:",
+            flags = "aw:",
             desc = "Убирает учасника(ов) из региона",
-            min = 2)
+            min = 1)
     public void removeMember(CommandContext args, CommandSender sender) throws CommandException {
         final World world;
-        Player player;
+        Player player = null;
         LocalPlayer localPlayer = null;
+        if (sender instanceof Player) {
+            player = (Player) sender;
+            localPlayer = plugin.wrapPlayer(player);
+        }
         if (args.hasFlag('w')) {
             world = plugin.matchWorld(sender, args.getFlag('w'));
         } else {
-            player = plugin.checkPlayer(sender);
-            localPlayer = plugin.wrapPlayer(player);
-            world = player.getWorld();
+            if (player != null) {
+                world = player.getWorld();
+            } else {
+                throw new CommandException("No world specified. Use -w <worldname>.");
+            }
         }
 
         String id = args.getString(0);
@@ -197,7 +215,14 @@ public class RegionMemberCommands {
             }
         }
 
-        RegionDBUtil.removeFromDomain(region.getMembers(), args.getPaddedSlice(2, 0), 0);
+        if (args.hasFlag('a')) {
+            region.getMembers().removaAll();
+        } else {
+            if (args.argsLength() < 2) {
+                throw new CommandException("List some names to remove, or use -a to remove all.");
+            }
+            RegionDBUtil.removeFromDomain(region.getMembers(), args.getPaddedSlice(2, 0), 0);
+        }
 
         sender.sendMessage(ChatColor.YELLOW
                 + "Регион '" + id + "' обновлен.");
@@ -212,20 +237,26 @@ public class RegionMemberCommands {
     
     @Command(aliases = {"removeowner", "remowner"},
             usage = "<id> <игроки...>",
-            flags = "w:",
+            flags = "aw:",
             desc = "Убирает владельца(ов) из региона",
-            min = 2)
+            min = 1)
     public void removeOwner(CommandContext args,
             CommandSender sender) throws CommandException {
         final World world;
-        Player player;
+        Player player = null;
         LocalPlayer localPlayer = null;
+        if (sender instanceof Player) {
+            player = (Player) sender;
+            localPlayer = plugin.wrapPlayer(player);
+        }
         if (args.hasFlag('w')) {
             world = plugin.matchWorld(sender, args.getFlag('w'));
         } else {
-            player = plugin.checkPlayer(sender);
-            localPlayer = plugin.wrapPlayer(player);
-            world = player.getWorld();
+            if (player != null) {
+                world = player.getWorld();
+            } else {
+                throw new CommandException("No world specified. Use -w <worldname>.");
+            }
         }
 
         String id = args.getString(0);
@@ -249,7 +280,14 @@ public class RegionMemberCommands {
             }
         }
 
-        RegionDBUtil.removeFromDomain(region.getOwners(), args.getPaddedSlice(2, 0), 0);
+        if (args.hasFlag('a')) {
+            region.getOwners().removaAll();
+        } else {
+            if (args.argsLength() < 2) {
+                throw new CommandException("List some names to remove, or use -a to remove all.");
+            }
+            RegionDBUtil.removeFromDomain(region.getOwners(), args.getPaddedSlice(2, 0), 0);
+        }
 
         sender.sendMessage(ChatColor.YELLOW
                 + "Регион '" + id + "' обновлен.");
