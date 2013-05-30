@@ -1489,7 +1489,7 @@ public class WorldGuardPlayerListener implements Listener {
             }
 
             if (!result.isEmpty()) {
-                player.sendMessage(ChatColor.RED + "Команда "+ blockedCommand + " запрещена в данном регионе.");
+                player.sendMessage(ChatColor.RED + "Команда "+ result + " запрещена в данном регионе.");
                 event.setCancelled(true);
                 return;
             }
