@@ -109,6 +109,11 @@ public class WorldGuardPlayerListener implements Listener {
         }
     }
 
+    // unsure if anyone actually started using this yet, but just in case...
+    public static boolean checkMove(WorldGuardPlugin plugin, Player player, World world, Location from, Location to) {
+        return checkMove(plugin, player, from, to); // drop world since it used to be mishandled
+    }
+
     /**
      * Handles movement related events, including changing gamemode, sending
      * greeting/farewell messages, etc.
@@ -116,19 +121,23 @@ public class WorldGuardPlayerListener implements Listener {
      * although WGBukkit.getPlugin() may be used.
      * @return true if the movement should not be allowed
      */
-    public static boolean checkMove(WorldGuardPlugin plugin, Player player, World world, Location from, Location to) {
+    public static boolean checkMove(WorldGuardPlugin plugin, Player player, Location from, Location to) {
         PlayerFlagState state = plugin.getFlagStateManager().getState(player);
 
         //Flush states in multiworld scenario
-        if (state.lastWorld != null && !state.lastWorld.equals(world)) {
+        if (state.lastWorld != null && !state.lastWorld.equals(to.getWorld())) {
             plugin.getFlagStateManager().forget(player);
             state = plugin.getFlagStateManager().getState(player);
         }
 
+        World world = from.getWorld();
+        World toWorld = to.getWorld();
+
         LocalPlayer localPlayer = plugin.wrapPlayer(player);
         boolean hasBypass = plugin.getGlobalRegionManager().hasBypass(player, world);
+        boolean hasRemoteBypass = plugin.getGlobalRegionManager().hasBypass(player, toWorld);
 
-        RegionManager mgr = plugin.getGlobalRegionManager().get(world);
+        RegionManager mgr = plugin.getGlobalRegionManager().get(toWorld);
         Vector pt = new Vector(to.getBlockX(), to.getBlockY(), to.getBlockZ());
         ApplicableRegionSet set = mgr.getApplicableRegions(pt);
 
@@ -171,7 +180,7 @@ public class WorldGuardPlayerListener implements Listener {
         */
 
         boolean entryAllowed = set.allows(DefaultFlag.ENTRY, localPlayer);
-        if (!hasBypass && (!entryAllowed /*|| regionFull*/)) {
+        if (!hasRemoteBypass && (!entryAllowed /*|| regionFull*/)) {
             String message = /*maxPlayerMessage != null ? maxPlayerMessage :*/ "You are not permitted to enter this area.";
 
             player.sendMessage(ChatColor.DARK_RED + message);
@@ -180,8 +189,9 @@ public class WorldGuardPlayerListener implements Listener {
 
         // Have to set this state
         if (state.lastExitAllowed == null) {
-            state.lastExitAllowed = mgr.getApplicableRegions(toVector(from))
-                    .allows(DefaultFlag.EXIT, localPlayer);
+            state.lastExitAllowed = plugin.getGlobalRegionManager().get(world)
+                        .getApplicableRegions(toVector(from))
+                        .allows(DefaultFlag.EXIT, localPlayer);
         }
 
         boolean exitAllowed = set.allows(DefaultFlag.EXIT, localPlayer);
@@ -286,7 +296,7 @@ public class WorldGuardPlayerListener implements Listener {
                 if (event.getFrom().getBlockX() != event.getTo().getBlockX()
                         || event.getFrom().getBlockY() != event.getTo().getBlockY()
                         || event.getFrom().getBlockZ() != event.getTo().getBlockZ()) {
-                    boolean result = checkMove(plugin, player, world, event.getFrom(), event.getTo());
+                    boolean result = checkMove(plugin, player, event.getFrom(), event.getTo());
                     if (result) {
                         Location newLoc = event.getFrom();
                         newLoc.setX(newLoc.getBlockX() + 0.5);
@@ -784,7 +794,8 @@ public class WorldGuardPlayerListener implements Listener {
 
             if (item.getTypeId() == ItemID.FIRE_CHARGE || item.getTypeId() == ItemID.FLINT_AND_TINDER) {
                 if (!plugin.getGlobalRegionManager().hasBypass(localPlayer, world)
-                        && !placedInSet.allows(DefaultFlag.LIGHTER, localPlayer)) {
+                        && !plugin.canBuild(player, placedIn)
+                        && !placedInSet.allows(DefaultFlag.LIGHTER)) {
                     event.setCancelled(true);
                     event.setUseItemInHand(Result.DENY);
                     player.sendMessage(ChatColor.DARK_RED + "You're not allowed to use that here.");
@@ -1377,10 +1388,12 @@ public class WorldGuardPlayerListener implements Listener {
             ApplicableRegionSet setFrom = mgr.getApplicableRegions(ptFrom);
             LocalPlayer localPlayer = plugin.wrapPlayer(event.getPlayer());
 
-            boolean result = checkMove(plugin, event.getPlayer(), event.getPlayer().getWorld(), event.getFrom(), event.getTo());
-            if (result) {
-                event.setCancelled(true);
-                return;
+            if (cfg.usePlayerTeleports) {
+                boolean result = checkMove(plugin, event.getPlayer(), event.getFrom(), event.getTo());
+                if (result) {
+                    event.setCancelled(true);
+                    return;
+                }
             }
 
             if (event.getCause() == TeleportCause.ENDER_PEARL) {
