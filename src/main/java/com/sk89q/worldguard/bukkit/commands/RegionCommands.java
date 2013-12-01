@@ -290,17 +290,28 @@ public final class RegionCommands {
         }
     }
 
+    private static void commitChanges(CommandSender sender, RegionManager regionManager)
+            throws CommandException {
+        commitChanges(sender, regionManager, false);
+    }
+
+    private static void reloadChanges(CommandSender sender, RegionManager regionManager)
+            throws CommandException {
+        reloadChanges(sender, regionManager, false);
+    }
+
     /**
      * Save the region database.
      * 
      * @param sender the sender
      * @param regionManager the region manager
-     * @throws com.sk89q.minecraft.util.commands.CommandException throw on an error
+     * @param silent whether to suppress messages sent to the player
+     * @throws CommandException throw on an error
      */
-    private static void commitChanges(CommandSender sender, RegionManager regionManager)
+    private static void commitChanges(CommandSender sender, RegionManager regionManager, boolean silent)
             throws CommandException {
         try {
-            if (regionManager.getRegions().size() >= 500) {
+            if (!silent && regionManager.getRegions().size() >= 500) {
                 sender.sendMessage(ChatColor.GRAY +
                         "Now saving region list to disk... (Taking too long? We're fixing it)");
             }
@@ -311,16 +322,17 @@ public final class RegionCommands {
     }
 
     /**
-     * Save the region database.
+     * Load the region database.
      * 
      * @param sender the sender
      * @param regionManager the region manager
-     * @throws com.sk89q.minecraft.util.commands.CommandException throw on an error
+     * @param silent whether to suppress messages sent to the player
+     * @throws CommandException throw on an error
      */
-    private static void reloadChanges(CommandSender sender, RegionManager regionManager)
+    private static void reloadChanges(CommandSender sender, RegionManager regionManager, boolean silent)
             throws CommandException {
         try {
-            if (regionManager.getRegions().size() >= 500) {
+            if (!silent && regionManager.getRegions().size() >= 500) {
                 sender.sendMessage(ChatColor.GRAY +
                         "Now loading region list from disk... (Taking too long? We're fixing it)");
             }
@@ -739,7 +751,10 @@ public final class RegionCommands {
         
         // Check permissions
         if (!getPermissionModel(sender).mayList(ownedBy)) {
-            throw new CommandPermissionsException();
+            ownedBy = sender.getName(); // assume they only want their own
+            if (!getPermissionModel(sender).mayList(ownedBy)) {
+                throw new CommandPermissionsException();
+            }
         }
 
         RegionManager mgr = plugin.getGlobalRegionManager().get(world);
@@ -1068,18 +1083,39 @@ public final class RegionCommands {
      * @param sender the sender
      * @throws com.sk89q.minecraft.util.commands.CommandException any error
      */
-    @Command(aliases = {"load", "reload"}, usage = "[world]",
-            desc = "Reload regions from file", max = 1)
+    @Command(aliases = {"load", "reload"},
+            usage = "[world]",
+            desc = "Reload regions from file",
+            flags = "w:")
     public void load(CommandContext args, CommandSender sender) throws CommandException {
-        World world = getWorld(args, sender, 'w'); // Get the world
+        World world = null;
+        try {
+            world = getWorld(args, sender, 'w'); // Get the world
+        } catch (CommandException e) {
+            // assume the user wants to reload all worlds
+        }
 
         // Check permissions
         if (!getPermissionModel(sender).mayForceLoadRegions()) {
             throw new CommandPermissionsException();
         }
 
-        RegionManager regionManager = plugin.getGlobalRegionManager().get(world);
-        reloadChanges(sender, regionManager);
+        if (world != null) {
+            RegionManager regionManager = plugin.getGlobalRegionManager().get(world);
+            if (regionManager == null) {
+                throw new CommandException("No region manager exists for world '" + world.getName() + "'.");
+            }
+            reloadChanges(sender, regionManager);
+        } else {
+            sender.sendMessage(ChatColor.YELLOW + "Loading all region databases... This might take a bit.");
+            for (World w : plugin.getServer().getWorlds()) {
+                RegionManager regionManager = plugin.getGlobalRegionManager().get(w);
+                if (regionManager == null) {
+                    continue;
+                }
+                reloadChanges(sender, regionManager, true);
+            }
+        }
 
         sender.sendMessage(ChatColor.YELLOW + "Region databases loaded.");
     }
@@ -1091,19 +1127,39 @@ public final class RegionCommands {
      * @param sender the sender
      * @throws com.sk89q.minecraft.util.commands.CommandException any error
      */
-    @Command(aliases = {"save", "write"}, usage = "[world]",
-            desc = "Re-save regions to file", max = 1)
+    @Command(aliases = {"save", "write"},
+            usage = "[world]",
+            desc = "Re-save regions to file",
+            flags = "w:")
     public void save(CommandContext args, CommandSender sender) throws CommandException {
-        World world = getWorld(args, sender, 'w'); // Get the world
+        World world = null;
+        try {
+            world = getWorld(args, sender, 'w'); // Get the world
+        } catch (CommandException e) {
+            // assume user wants to save all worlds
+        }
 
         // Check permissions
         if (!getPermissionModel(sender).mayForceSaveRegions()) {
             throw new CommandPermissionsException();
         }
 
-        RegionManager regionManager = plugin.getGlobalRegionManager().get(world);
-        commitChanges(sender, regionManager);
-
+        if (world != null) {
+            RegionManager regionManager = plugin.getGlobalRegionManager().get(world);
+            if (regionManager == null) {
+                throw new CommandException("No region manager exists for world '" + world.getName() + "'.");
+            }
+            commitChanges(sender, regionManager);
+        } else {
+            sender.sendMessage(ChatColor.YELLOW + "Saving all region databases... This might take a bit.");
+            for (World w : plugin.getServer().getWorlds()) {
+                RegionManager regionManager = plugin.getGlobalRegionManager().get(w);
+                if (regionManager == null) {
+                    continue;
+                }
+                commitChanges(sender, regionManager, true);
+            }
+        }
         sender.sendMessage(ChatColor.YELLOW + "Region databases saved.");
     }
 
