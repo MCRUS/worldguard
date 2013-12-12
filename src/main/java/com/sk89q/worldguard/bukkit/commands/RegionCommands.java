@@ -326,6 +326,7 @@ public final class RegionCommands {
      * 
      * @param sender the sender
      * @param regionManager the region manager
+     * @param silent whether to suppress messages sent to the player
      * @throws CommandException throw on an error
      */
     private static void reloadChanges(CommandSender sender, RegionManager regionManager, boolean silent)

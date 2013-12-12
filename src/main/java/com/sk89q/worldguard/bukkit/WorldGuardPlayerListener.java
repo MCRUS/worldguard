@@ -1282,7 +1282,7 @@ public class WorldGuardPlayerListener implements Listener {
         if (!plugin.getGlobalRegionManager().canBuild(
                 player, event.getBlockClicked().getRelative(event.getBlockFace()))
                 && !(event.getItemStack().getTypeId() == ItemID.MILK_BUCKET)) {
-            player.sendMessage(ChatColor.DARK_RED + "Вы не можете разливать содержимое ведра в данном регионе.");
+            player.sendMessage(ChatColor.DARK_RED + "Вы не можете наполнять ведро в данном регионе.");
             event.setCancelled(true);
             return;
         }
