@@ -1171,7 +1171,7 @@ public final class RegionCommands {
      * @throws com.sk89q.minecraft.util.commands.CommandException any error
      */
     @Command(aliases = {"migratedb"}, usage = "<from> <to>",
-            desc = "Migrate from one Protection Database to another.", min = 1)
+            desc = "Migrate from one Protection Database to another.", min = 2, max = 2)
     public void migrateDB(CommandContext args, CommandSender sender) throws CommandException {
         // Check permissions
         if (!getPermissionModel(sender).mayMigrateRegionStore()) {
