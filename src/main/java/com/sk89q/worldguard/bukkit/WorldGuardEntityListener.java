@@ -57,6 +57,7 @@ import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.projectiles.ProjectileSource;
 
 import java.util.Set;
 
@@ -311,7 +312,7 @@ public class WorldGuardEntityListener implements Listener {
                         RegionManager mgr = plugin.getGlobalRegionManager().get(player.getWorld());
                         ApplicableRegionSet set = mgr.getApplicableRegions(pt);
                         if (fireball.getShooter() instanceof Player) {
-                            Vector pt2 = toVector(fireball.getShooter().getLocation());
+                            Vector pt2 = toVector(((Player) fireball.getShooter()).getLocation());
                             if (!mgr.getApplicableRegions(pt2).allows(DefaultFlag.PVP, plugin.wrapPlayer((Player) fireball.getShooter()))) {
                                 tryCancelPVPEvent((Player) fireball.getShooter(), player, event, true);
                             } else if (!set.allows(DefaultFlag.PVP, localPlayer)) {
@@ -380,7 +381,13 @@ public class WorldGuardEntityListener implements Listener {
 
     private void onEntityDamageByProjectile(EntityDamageByEntityEvent event) {
         Entity defender = event.getEntity();
-        Entity attacker = ((Projectile) event.getDamager()).getShooter();
+        Entity attacker;
+        ProjectileSource source = ((Projectile) event.getDamager()).getShooter();
+        if (source instanceof LivingEntity) {
+            attacker = (LivingEntity) source;
+        } else {
+            return;
+        }
 
         if (defender instanceof Player) {
             Player player = (Player) defender;
