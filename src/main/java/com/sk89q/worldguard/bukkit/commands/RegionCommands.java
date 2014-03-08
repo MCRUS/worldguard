@@ -69,7 +69,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion.CircularInheritan
  * Implements the /region commands for WorldGuard.
  */
 public final class RegionCommands {
-    
+
     private final WorldGuardPlugin plugin;
 
     private MigratorKey migrateDBRequest;
@@ -78,21 +78,21 @@ public final class RegionCommands {
     public RegionCommands(WorldGuardPlugin plugin) {
         this.plugin = plugin;
     }
-    
+
     /**
      * Get the permission model to lookup permissions.
-     * 
+     *
      * @param sender the sender
      * @return the permission model
      */
     private static RegionPermissionModel getPermissionModel(CommandSender sender) {
         return new RegionPermissionModel(WorldGuardPlugin.inst(), sender);
     }
-    
+
     /**
      * Gets the world from the given flag, or falling back to the the current player
      * if the sender is a player, otherwise reporting an error.
-     * 
+     *
      * @param args the arguments
      * @param sender the sender
      * @param flag the flag (such as 'w')
@@ -112,10 +112,10 @@ public final class RegionCommands {
             }
         }
     }
-    
+
     /**
      * Validate a region ID.
-     * 
+     *
      * @param id the id
      * @param allowGlobal whether __global__ is allowed
      * @return the id given
@@ -132,16 +132,16 @@ public final class RegionCommands {
             throw new CommandException(
                     "Извините, но Вы не можете использовать глобальный регион.");
         }
-        
+
         return id;
     }
-    
+
     /**
      * Get a protected region by a given name, otherwise throw a
      * {@link com.sk89q.minecraft.util.commands.CommandException}.
-     * 
+     *
      * <p>This also validates the region ID.</p>
-     * 
+     *
      * @param regionManager the region manager
      * @param id the name to search
      * @param allowGlobal true to allow selecting __global__
@@ -152,7 +152,7 @@ public final class RegionCommands {
             throws CommandException {
         // Validate the id
         validateRegionId(id, allowGlobal);
-        
+
         ProtectedRegion region = regionManager.getRegionExact(id);
 
         // No region found!
@@ -163,21 +163,21 @@ public final class RegionCommands {
                 regionManager.addRegion(region);
                 return region;
             }
-            
+
             throw new CommandException(
                     "Региона под именем '" + id + "' не существует.");
         }
-        
+
         return region;
     }
-    
+
 
     /**
      * Get the region at the player's location, if possible.
-     * 
+     *
      * <p>If the player is standing in several regions, an error will be raised
      * and a list of regions will be provided.</p>
-     * 
+     *
      * @param regionManager the region manager
      * @param player the player
      * @return a region
@@ -190,13 +190,13 @@ public final class RegionCommands {
 
     /**
      * Get the region at the player's location, if possible.
-     * 
+     *
      * <p>If the player is standing in several regions, an error will be raised
      * and a list of regions will be provided.</p>
-     * 
+     *
      * <p>If the player is not standing in any regions, the global region will
      * returned if allowGlobal is true and it exists.</p>
-     * 
+     *
      * @param regionManager the region manager
      * @param player the player
      * @param allowGlobal whether to search for a global region if no others are found
@@ -207,21 +207,21 @@ public final class RegionCommands {
             RegionManager regionManager, Player player, boolean allowGlobal) throws CommandException {
         ApplicableRegionSet set = regionManager.getApplicableRegions(
                 player.getLocation());
-        
+
         if (set.size() == 0) {
             if (allowGlobal) {
                  ProtectedRegion global = findExistingRegion(regionManager, "__global__", true);
-                 player.sendMessage(ChatColor.GRAY + "You're not standing in any " +
-                         "regions. Using the global region for this world instead.");
+                 player.sendMessage(ChatColor.GRAY + "Вы не стоите ни в одном из регионов. " +
+                         "Используем глобальный регион.");
                  return global;
             }
             throw new CommandException(
-                "You're not standing in a region." +
-                "Specify an ID if you want to select a specific region.");
+                "Вы не стоите ни в одном из регионов." +
+                "Укажите ID региона если хотите указать какой-то конкретный регион.");
         } else if (set.size() > 1) {
             StringBuilder builder = new StringBuilder();
             boolean first = true;
-            
+
             for (ProtectedRegion region : set) {
                 if (!first) {
                     builder.append(", ");
@@ -229,20 +229,20 @@ public final class RegionCommands {
                 first = false;
                 builder.append(region.getId());
             }
-            
+
             throw new CommandException(
-                    "You're standing in several regions, and " +
-                    "WorldGuard is not sure what you want.\nYou're in: " +
+                    "Вы стоите в нескольких регионах и " +
+                    "WorldGuard не знает какую использовать.\nВы в: " +
                             builder.toString());
         }
-        
+
         return set.iterator().next();
     }
-    
+
     /**
      * Get a WorldEdit selection for a player, or emit an exception if there is none
      * available.
-     * 
+     *
      * @param player the player
      * @return the selection
      * @throws com.sk89q.minecraft.util.commands.CommandException thrown on an error
@@ -253,17 +253,17 @@ public final class RegionCommands {
 
         if (selection == null) {
             throw new CommandException(
-                    "Please select an area first. " +
-                    "Use WorldEdit to make a selection! " +
+                    "Сначала выделите зону. " +
+                    "Используйте WorldEdit для создания выделения! " +
                     "(wiki: http://wiki.sk89q.com/wiki/WorldEdit).");
         }
-        
+
         return selection;
     }
-    
+
     /**
      * Create a {@link com.sk89q.worldguard.protection.regions.ProtectedRegion} from the player's selection.
-     * 
+     *
      * @param player the player
      * @param id the ID of the new region
      * @return a new region
@@ -271,9 +271,9 @@ public final class RegionCommands {
      */
     private static ProtectedRegion createRegionFromSelection(Player player, String id)
             throws CommandException {
-        
+
         Selection selection = getSelection(player);
-        
+
         // Detect the type of region from WorldEdit
         if (selection instanceof Polygonal2DSelection) {
             Polygonal2DSelection polySel = (Polygonal2DSelection) selection;
@@ -286,7 +286,7 @@ public final class RegionCommands {
             return new ProtectedCuboidRegion(id, min, max);
         } else {
             throw new CommandException(
-                    "Sorry, you can only use cuboids and polygons for WorldGuard regions.");
+                    "Извените. только кубоиды и полигоны могут быть регионами в WorldGuard.");
         }
     }
 
@@ -302,7 +302,7 @@ public final class RegionCommands {
 
     /**
      * Save the region database.
-     * 
+     *
      * @param sender the sender
      * @param regionManager the region manager
      * @param silent whether to suppress messages sent to the player
@@ -313,17 +313,17 @@ public final class RegionCommands {
         try {
             if (!silent && regionManager.getRegions().size() >= 500) {
                 sender.sendMessage(ChatColor.GRAY +
-                        "Now saving region list to disk... (Taking too long? We're fixing it)");
+                        "Сохраняем список регионов на диск... (Слишком долго? Работаем над исправлением)");
             }
             regionManager.save();
         } catch (ProtectionDatabaseException e) {
-            throw new CommandException("Uh oh, regions did not save: " + e.getMessage());
+            throw new CommandException("Упс, регионы не сохранены: " + e.getMessage());
         }
     }
 
     /**
      * Load the region database.
-     * 
+     *
      * @param sender the sender
      * @param regionManager the region manager
      * @param silent whether to suppress messages sent to the player
@@ -334,17 +334,17 @@ public final class RegionCommands {
         try {
             if (!silent && regionManager.getRegions().size() >= 500) {
                 sender.sendMessage(ChatColor.GRAY +
-                        "Now loading region list from disk... (Taking too long? We're fixing it)");
+                        "Загружаем список регионов с диска... (Слишком долго? Работаем над исправлением)");
             }
             regionManager.load();
         } catch (ProtectionDatabaseException e) {
-            throw new CommandException("Uh oh, regions did not load: " + e.getMessage());
+            throw new CommandException("Упс, регионы не сохранены: " + e.getMessage());
         }
     }
 
     /**
      * Set a player's selection to a given region.
-     * 
+     *
      * @param player the player
      * @param region the region
      * @throws com.sk89q.minecraft.util.commands.CommandException thrown on a command error
@@ -354,7 +354,7 @@ public final class RegionCommands {
         WorldEditPlugin worldEdit = WorldGuardPlugin.inst().getWorldEdit();
 
         World world = player.getWorld();
-        
+
         // Set selection
         if (region instanceof ProtectedCuboidRegion) {
             ProtectedCuboidRegion cuboid = (ProtectedCuboidRegion) region;
@@ -362,8 +362,8 @@ public final class RegionCommands {
             Vector pt2 = cuboid.getMaximumPoint();
             CuboidSelection selection = new CuboidSelection(world, pt1, pt2);
             worldEdit.setSelection(player, selection);
-            player.sendMessage(ChatColor.YELLOW + "Region selected as a cuboid.");
-            
+            player.sendMessage(ChatColor.YELLOW + "Регион выделен как кубоид.");
+
         } else if (region instanceof ProtectedPolygonalRegion) {
             ProtectedPolygonalRegion poly2d = (ProtectedPolygonalRegion) region;
             Polygonal2DSelection selection = new Polygonal2DSelection(
@@ -371,22 +371,22 @@ public final class RegionCommands {
                     poly2d.getMinimumPoint().getBlockY(),
                     poly2d.getMaximumPoint().getBlockY() );
             worldEdit.setSelection(player, selection);
-            player.sendMessage(ChatColor.YELLOW + "Region selected as a polygon.");
-            
+            player.sendMessage(ChatColor.YELLOW + "Регион выделен как полигон.");
+
         } else if (region instanceof GlobalProtectedRegion) {
             throw new CommandException(
-                    "Can't select global regions! " +
-                    "That would cover the entire world.");
-            
+                    "Не могу выледитть глобальный регион! " +
+                    "Он распостраняется на весь мир.");
+
         } else {
-            throw new CommandException("Unknown region type: " +
+            throw new CommandException("Неизвестный тип региона: " +
                     region.getClass().getCanonicalName());
         }
     }
 
     /**
      * Utility method to set a flag.
-     * 
+     *
      * @param region the region
      * @param flag the flag
      * @param sender the sender
@@ -398,17 +398,17 @@ public final class RegionCommands {
                     throws InvalidFlagFormat {
         region.setFlag(flag, flag.parseInput(WorldGuardPlugin.inst(), sender, value));
     }
-    
+
     /**
      * Defines a new region.
-     * 
+     *
      * @param args the arguments
      * @param sender the sender
      * @throws com.sk89q.minecraft.util.commands.CommandException any error
      */
     @Command(aliases = {"define", "def", "d", "create"},
-             usage = "<id> [<owner1> [<owner2> [<owners...>]]]",
-             desc = "Defines a region",
+             usage = "<id> [<владелец1> [<владелец2> [<владельцы...>]]]",
+             desc = "Объявляет регион",
              min = 1)
     public void define(CommandContext args, CommandSender sender)
             throws CommandException {
@@ -418,15 +418,15 @@ public final class RegionCommands {
         if (!getPermissionModel(sender).mayDefine()) {
             throw new CommandPermissionsException();
         }
-        
+
         // Get and validate the region ID
         String id = validateRegionId(args.getString(0), false);
-        
+
         // Can't replace regions with this command
         RegionManager regionManager = plugin.getGlobalRegionManager().get(player.getWorld());
         if (regionManager.hasRegion(id)) {
             throw new CommandException(
-                    "That region is already defined. To change the shape, use " +
+                    "Данный регион уже создан. Для изменения позиции используйте " +
                     "/region redefine " + id);
         }
 
@@ -440,43 +440,43 @@ public final class RegionCommands {
 
         regionManager.addRegion(region);
         commitChanges(sender, regionManager); // Save to disk
-        
+
         // Issue a warning about height
         int height = region.getMaximumPoint().getBlockY() - region.getMinimumPoint().getBlockY();
         if (height <= 2) {
             sender.sendMessage(ChatColor.GOLD +
-                    "(Warning: The height of the region was " + (height + 1) + " block(s).)");
+                    "(Внимание: Высота региона " + (height + 1) + " " + StringUtil.plural(height + 1, "блок", "блока", "блоков") + ".)");
         }
 
         // Hint
         if (regionManager.getRegions().size() <= 2) {
             sender.sendMessage(ChatColor.GRAY +
-                    "(This region is NOW PROTECTED from modification from others. " +
-                    "Don't want that? Use " +
+                    "(Этот регин ТЕПЕРЬ ЗАЩИЩЕН от изменения другими. " +
+                    "Не хотите? используйте " +
                     ChatColor.AQUA + "/rg flag " + id + " passthrough allow" +
                     ChatColor.GRAY + ")");
         }
-        
+
         // Tell the user
         sender.sendMessage(ChatColor.YELLOW + "Новый регион был назван '" + id + "'.");
     }
 
     /**
      * Re-defines a region with a new selection.
-     * 
+     *
      * @param args the arguments
      * @param sender the sender
      * @throws com.sk89q.minecraft.util.commands.CommandException any error
      */
     @Command(aliases = {"redefine", "update", "move"},
              usage = "<id>",
-             desc = "Re-defines the shape of a region",
+             desc = "Переназначает регион",
              min = 1, max = 1)
     public void redefine(CommandContext args, CommandSender sender)
             throws CommandException {
         Player player = plugin.checkPlayer(sender);
         World world = player.getWorld();
-        
+
         // Get and validate the region ID
         String id = validateRegionId(args.getString(0), false);
 
@@ -512,34 +512,34 @@ public final class RegionCommands {
             sender.sendMessage(ChatColor.GOLD +
                     "(Предупреждение: Высота региона будет " + (height + 1) + StringUtil.plural(height + 1, " блок", " блока", " блоков") + ".)");
         }
-        
+
         sender.sendMessage(ChatColor.YELLOW + "Регион '" + id + "' обновлен.");
     }
 
     /**
      * Claiming command for users.
-     * 
+     *
      * <p>This command is a joke and it needs to be rewritten. It was contributed
      * code :(</p>
-     * 
+     *
      * @param args the arguments
      * @param sender the sender
      * @throws com.sk89q.minecraft.util.commands.CommandException any error
      */
     @Command(aliases = {"claim"},
-             usage = "<id> [<owner1> [<owner2> [<owners...>]]]",
-             desc = "Claim a region",
+             usage = "<id> [<владелец1> [<владелец2> [<владельцы...>]]]",
+             desc = "Создает регион",
              min = 1)
     public void claim(CommandContext args, CommandSender sender) throws CommandException {
         Player player = plugin.checkPlayer(sender);
         LocalPlayer localPlayer = plugin.wrapPlayer(player);
         RegionPermissionModel permModel = getPermissionModel(sender);
-        
+
         // Check permissions
         if (!permModel.mayClaim()) {
             throw new CommandPermissionsException();
         }
-        
+
         // Get and validate the region ID
         String id = validateRegionId(args.getString(0), false);
 
@@ -590,8 +590,8 @@ public final class RegionCommands {
             }
         } else {
             if (wcfg.claimOnlyInsideExistingRegions) {
-                throw new CommandException("You may only claim regions inside " +
-                        "existing regions that you or your group own.");
+                throw new CommandException("Вы можете создавать регионы только внутри " +
+                        "существующих регионов которые пренадлежат вам или вашей группе.");
             }
         }
 
@@ -629,7 +629,7 @@ public final class RegionCommands {
         }*/
 
         region.getOwners().addPlayer(player.getName());
-        
+
         mgr.addRegion(region);
         commitChanges(sender, mgr); // Save to disk
         sender.sendMessage(ChatColor.YELLOW + "Регион '" + id + "' обновлён.");
@@ -637,21 +637,21 @@ public final class RegionCommands {
 
     /**
      * Get a WorldEdit selection from a region.
-     * 
+     *
      * @param args the arguments
      * @param sender the sender
      * @throws com.sk89q.minecraft.util.commands.CommandException any error
      */
     @Command(aliases = {"select", "sel", "s"},
              usage = "[id]",
-             desc = "Load a region as a WorldEdit selection",
+             desc = "Выделяет регион с помощью WorldEdit",
              min = 0, max = 1)
     public void select(CommandContext args, CommandSender sender) throws CommandException {
         Player player = plugin.checkPlayer(sender);
         World world = player.getWorld();
         RegionManager regionManager = plugin.getGlobalRegionManager().get(world);
         ProtectedRegion existing;
-        
+
         // If no arguments were given, get the region that the player is inside
         if (args.argsLength() == 0) {
             existing = findRegionStandingIn(regionManager, player);
@@ -670,7 +670,7 @@ public final class RegionCommands {
 
     /**
      * Get information about a region.
-     * 
+     *
      * @param args the arguments
      * @param sender the sender
      * @throws com.sk89q.minecraft.util.commands.CommandException any error
@@ -687,13 +687,13 @@ public final class RegionCommands {
         // Lookup the existing region
         RegionManager regionManager = plugin.getGlobalRegionManager().get(world);
         ProtectedRegion existing;
-        
+
         if (args.argsLength() == 0) { // Get region from where the player is
             if (!(sender instanceof Player)) {
                 throw new CommandException("Пожалуйтса укажите " +
                         "регион с помощью /region info -w world_name region_name.");
             }
-            
+
             existing = findRegionStandingIn(regionManager, (Player) sender, true);
         } else { // Get region from the ID
             existing = findExistingRegion(regionManager, args.getString(0), true);
@@ -715,14 +715,14 @@ public final class RegionCommands {
             if (!permModel.maySelect(existing)) {
                 throw new CommandPermissionsException();
             }
-            
+
             setPlayerSelection(plugin.checkPlayer(sender), existing);
         }
     }
 
     /**
      * List regions.
-     * 
+     *
      * @param args the arguments
      * @param sender the sender
      * @throws com.sk89q.minecraft.util.commands.CommandException any error
@@ -735,20 +735,20 @@ public final class RegionCommands {
     public void list(CommandContext args, CommandSender sender) throws CommandException {
         World world = getWorld(args, sender, 'w'); // Get the world
         String ownedBy;
-        
+
         // Get page
         int page = args.getInteger(0, 1) - 1;
         if (page < 0) {
             page = 0;
         }
-        
+
         // -p flag to lookup a player's regions
         if (args.hasFlag('p')) {
             ownedBy = args.getFlag('p');
         } else {
             ownedBy = null; // List all regions
         }
-        
+
         // Check permissions
         if (!getPermissionModel(sender).mayList(ownedBy)) {
             ownedBy = sender.getName(); // assume they only want their own
@@ -762,11 +762,11 @@ public final class RegionCommands {
 
         // Build a list of regions to show
         List<RegionListEntry> entries = new ArrayList<RegionListEntry>();
-        
+
         int index = 0;
         for (String id : regions.keySet()) {
             RegionListEntry entry = new RegionListEntry(id, index++);
-            
+
             // Filtering by owner?
             if (ownedBy != null) {
                 entry.isOwner = regions.get(id).isOwner(ownedBy);
@@ -779,7 +779,7 @@ public final class RegionCommands {
 
             entries.add(entry);
         }
-        
+
         Collections.sort(entries);
 
         final int totalSize = entries.size();
@@ -796,7 +796,7 @@ public final class RegionCommands {
                 if (i >= totalSize) {
                     break;
                 }
-                
+
                 sender.sendMessage(ChatColor.YELLOW.toString() + entries.get(i));
             }
         }
@@ -804,7 +804,7 @@ public final class RegionCommands {
 
     /**
      * Set a flag.
-     * 
+     *
      * @param args the arguments
      * @param sender the sender
      * @throws com.sk89q.minecraft.util.commands.CommandException any error
@@ -812,7 +812,7 @@ public final class RegionCommands {
     @Command(aliases = {"flag", "f"},
              usage = "<id> <flag> [-w world] [-g group] [value]",
              flags = "g:w:",
-             desc = "Set flags",
+             desc = "Выставляет флаги",
              min = 2)
     public void flag(CommandContext args, CommandSender sender) throws CommandException {
         World world = getWorld(args, sender, 'w'); // Get the world
@@ -848,16 +848,16 @@ public final class RegionCommands {
                 if (list.length() > 0) {
                     list.append(", ");
                 }
-                
+
                 list.append(flag.getName());
             }
 
             sender.sendMessage(ChatColor.RED + "Неизвестный флаг: " + flagName);
             sender.sendMessage(ChatColor.RED + "Доступные флаги: " + list);
-            
+
             return;
         }
-        
+
         // Also make sure that we can use this flag
         // This permission is confusing and probably should be replaced, but
         // but not here -- in the model
@@ -869,7 +869,7 @@ public final class RegionCommands {
         if (args.hasFlag('g')) {
             String group = args.getFlag('g');
             RegionGroupFlag groupFlag = foundFlag.getRegionGroupFlag();
-            
+
             if (groupFlag == null) {
                 throw new CommandException("Region flag '" + foundFlag.getName()
                         + "' does not have a group flag!");
@@ -897,7 +897,7 @@ public final class RegionCommands {
             sender.sendMessage(ChatColor.YELLOW
                     + "Флаг " + foundFlag.getName() + " в регионе '" +
                     existing.getId() + "' изменен на '" + value + "'.");
-        
+
         // No value? Clear the flag, if -g isn't specified
         } else if (!args.hasFlag('g')) {
             // Clear the flag only if neither [value] nor [-g group] was given
@@ -922,12 +922,12 @@ public final class RegionCommands {
             if (groupValue == groupFlag.getDefault()) {
                 existing.setFlag(groupFlag, null);
                 sender.sendMessage(ChatColor.YELLOW
-                        + "Region group flag for '" + foundFlag.getName() + "' reset to " +
-                        		"default.");
+                        + "Групповой флаг '" + foundFlag.getName() + "' был сброшен на значение " +
+                        		"по-умолчанию.");
             } else {
                 existing.setFlag(groupFlag, groupValue);
                 sender.sendMessage(ChatColor.YELLOW
-                        + "Region group flag for '" + foundFlag.getName() + "' set.");
+                        + "Групповой флаг '" + foundFlag.getName() + "' выставлен.");
             }
         }
 
@@ -944,7 +944,7 @@ public final class RegionCommands {
 
     /**
      * Set the priority of a region.
-     * 
+     *
      * @param args the arguments
      * @param sender the sender
      * @throws com.sk89q.minecraft.util.commands.CommandException any error
@@ -979,7 +979,7 @@ public final class RegionCommands {
 
     /**
      * Set the parent of a region.
-     * 
+     *
      * @param args the arguments
      * @param sender the sender
      * @throws com.sk89q.minecraft.util.commands.CommandException any error
@@ -996,7 +996,7 @@ public final class RegionCommands {
 
         // Lookup the existing region
         RegionManager regionManager = plugin.getGlobalRegionManager().get(world);
-        
+
         // Get parent and child
         child = findExistingRegion(regionManager, args.getString(0), false);
         if (args.argsLength() == 2) {
@@ -1016,10 +1016,10 @@ public final class RegionCommands {
             // Tell the user what's wrong
             RegionPrintoutBuilder printout = new RegionPrintoutBuilder(parent);
             printout.append(ChatColor.RED);
-            printout.append("Ох! Установка '" + parent.getId() + "' и так родитель " +
+            printout.append("Ох! Регион '" + parent.getId() + "' и так родитель " +
             		"региона '" + child.getId() + "', это приведет к зацикливанию.\n");
             printout.append(ChatColor.GRAY);
-            printout.append("(Current inheritance on '" + parent.getId() + "':\n");
+            printout.append("(Является дочерним регионом от '" + parent.getId() + "':\n");
             printout.appendParentTree(true);
             printout.append(ChatColor.GRAY);
             printout.append(")");
@@ -1028,14 +1028,14 @@ public final class RegionCommands {
         }
 
         commitChanges(sender, regionManager); // Save to disk
-        
+
         // Tell the user the current inheritance
         RegionPrintoutBuilder printout = new RegionPrintoutBuilder(child);
         printout.append(ChatColor.YELLOW);
-        printout.append("Inheritance set for region '" + child.getId() + "'.\n");
+        printout.append("Родительский регион для '" + child.getId() + "' выставлен.\n");
         if (parent != null) {
             printout.append(ChatColor.GRAY);
-            printout.append("(Current inheritance:\n");
+            printout.append("(Родительские регионы:\n");
             printout.appendParentTree(true);
             printout.append(ChatColor.GRAY);
             printout.append(")");
@@ -1046,7 +1046,7 @@ public final class RegionCommands {
 
     /**
      * Remove a region.
-     * 
+     *
      * @param args the arguments
      * @param sender the sender
      * @throws com.sk89q.minecraft.util.commands.CommandException any error
@@ -1078,14 +1078,14 @@ public final class RegionCommands {
 
     /**
      * Reload the region database.
-     * 
+     *
      * @param args the arguments
      * @param sender the sender
      * @throws com.sk89q.minecraft.util.commands.CommandException any error
      */
     @Command(aliases = {"load", "reload"},
-            usage = "[world]",
-            desc = "Reload regions from file",
+            usage = "[мир]",
+            desc = "Перезагружает регионы из файла",
             flags = "w:")
     public void load(CommandContext args, CommandSender sender) throws CommandException {
         World world = null;
@@ -1103,11 +1103,11 @@ public final class RegionCommands {
         if (world != null) {
             RegionManager regionManager = plugin.getGlobalRegionManager().get(world);
             if (regionManager == null) {
-                throw new CommandException("No region manager exists for world '" + world.getName() + "'.");
+                throw new CommandException("Для мира '" + world.getName() + "' нет менеджера регионов.");
             }
             reloadChanges(sender, regionManager);
         } else {
-            sender.sendMessage(ChatColor.YELLOW + "Loading all region databases... This might take a bit.");
+            sender.sendMessage(ChatColor.YELLOW + "Загружаем все менеджеры регионов... Это займет какое-то время.");
             for (World w : plugin.getServer().getWorlds()) {
                 RegionManager regionManager = plugin.getGlobalRegionManager().get(w);
                 if (regionManager == null) {
@@ -1117,19 +1117,19 @@ public final class RegionCommands {
             }
         }
 
-        sender.sendMessage(ChatColor.YELLOW + "Region databases loaded.");
+        sender.sendMessage(ChatColor.YELLOW + "Базы данных регионов загружены.");
     }
 
     /**
      * Re-save the region database.
-     * 
+     *
      * @param args the arguments
      * @param sender the sender
      * @throws com.sk89q.minecraft.util.commands.CommandException any error
      */
     @Command(aliases = {"save", "write"},
-            usage = "[world]",
-            desc = "Re-save regions to file",
+            usage = "[мир]",
+            desc = "Пересохраняет регионы",
             flags = "w:")
     public void save(CommandContext args, CommandSender sender) throws CommandException {
         World world = null;
@@ -1147,11 +1147,11 @@ public final class RegionCommands {
         if (world != null) {
             RegionManager regionManager = plugin.getGlobalRegionManager().get(world);
             if (regionManager == null) {
-                throw new CommandException("No region manager exists for world '" + world.getName() + "'.");
+                throw new CommandException("Для мира '" + world.getName() + "' нет менеджера регионов.");
             }
             commitChanges(sender, regionManager);
         } else {
-            sender.sendMessage(ChatColor.YELLOW + "Saving all region databases... This might take a bit.");
+            sender.sendMessage(ChatColor.YELLOW + "Сохраняем все базы... Это займет какое-то время.");
             for (World w : plugin.getServer().getWorlds()) {
                 RegionManager regionManager = plugin.getGlobalRegionManager().get(w);
                 if (regionManager == null) {
@@ -1160,29 +1160,29 @@ public final class RegionCommands {
                 commitChanges(sender, regionManager, true);
             }
         }
-        sender.sendMessage(ChatColor.YELLOW + "Region databases saved.");
+        sender.sendMessage(ChatColor.YELLOW + "Базы данных сохранены.");
     }
 
     /**
      * Migrate the region database.
-     * 
+     *
      * @param args the arguments
      * @param sender the sender
      * @throws com.sk89q.minecraft.util.commands.CommandException any error
      */
-    @Command(aliases = {"migratedb"}, usage = "<from> <to>",
-            desc = "Migrate from one Protection Database to another.", min = 2, max = 2)
+    @Command(aliases = {"migratedb"}, usage = "<из> <в>",
+            desc = "Мигрирование одной базы в другую.", min = 2, max = 2)
     public void migrateDB(CommandContext args, CommandSender sender) throws CommandException {
         // Check permissions
         if (!getPermissionModel(sender).mayMigrateRegionStore()) {
             throw new CommandPermissionsException();
         }
-        
+
         String from = args.getString(0).toLowerCase().trim();
         String to = args.getString(1).toLowerCase().trim();
 
         if (from.equals(to)) {
-            throw new CommandException("Will not migrate with common source and target.");
+            throw new CommandException("Источник и цель являются одной и тойже базой.");
         }
 
         Map<MigratorKey, Class<? extends AbstractDatabaseMigrator>> migrators =
@@ -1190,7 +1190,7 @@ public final class RegionCommands {
         MigratorKey key = new MigratorKey(from,to);
 
         if (!migrators.containsKey(key)) {
-            throw new CommandException("No migrator found for that combination and direction.");
+            throw new CommandException("Мигратор для данных баз не найден.");
         }
 
         long lastRequest = 10000000;
@@ -1201,8 +1201,8 @@ public final class RegionCommands {
             this.migrateDBRequest = key;
             this.migrateDBRequestDate = new Date();
 
-            throw new CommandException("This command is potentially dangerous.\n" +
-                    "Please ensure you have made a backup of your data, and then re-enter the command exactly to procede.");
+            throw new CommandException("Данная команда потенциально опасна.\n" +
+                    "Пожалуйста, удостовертесь что вы сделали резервные копии перед тем как запускать миграцию.");
         }
 
         Class<? extends AbstractDatabaseMigrator> cls = migrators.get(key);
@@ -1218,16 +1218,16 @@ public final class RegionCommands {
         } catch (InvocationTargetException ignore) {
         } catch (NoSuchMethodException ignore) {
         } catch (MigrationException e) {
-            throw new CommandException("Error migrating database: " + e.getMessage());
+            throw new CommandException("Ошибка миграции базы: " + e.getMessage());
         }
 
-        sender.sendMessage(ChatColor.YELLOW + "Regions have been migrated successfully.\n" +
-                "If you wish to use the destination format as your new backend, please update your config and reload WorldGuard.");
+        sender.sendMessage(ChatColor.YELLOW + "Регионы успешно мигрированы.\n" +
+                "Если Вы хотите использовать новую базу как основную - исправте файл настроек WorldGuard.");
     }
 
     /**
      * Teleport to a region
-     * 
+     *
      * @param args the arguments
      * @param sender the sender
      * @throws com.sk89q.minecraft.util.commands.CommandException any error
@@ -1254,14 +1254,14 @@ public final class RegionCommands {
         // -s for spawn location
         if (args.hasFlag('s')) {
             teleportLocation = existing.getFlag(DefaultFlag.SPAWN_LOC);
-            
+
             if (teleportLocation == null) {
                 throw new CommandException(
                         "В данном регионе нету точки спавна.");
             }
         } else {
             teleportLocation = existing.getFlag(DefaultFlag.TELE_LOC);
-            
+
             if (teleportLocation == null) {
                 throw new CommandException(
                         "В данном регионе нету точки телепорта.");

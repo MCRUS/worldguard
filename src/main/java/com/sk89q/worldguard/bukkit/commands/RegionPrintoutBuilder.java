@@ -62,16 +62,16 @@ public class RegionPrintoutBuilder {
      */
     public void appendBasics() {
         builder.append(ChatColor.BLUE);
-        builder.append("Region: ");
+        builder.append("Регион: ");
         builder.append(ChatColor.YELLOW);
         builder.append(region.getId());
         
         builder.append(ChatColor.GRAY);
-        builder.append(" (type=");
+        builder.append(" (тип=");
         builder.append(region.getTypeName());
         
         builder.append(ChatColor.GRAY);
-        builder.append(", priority=");
+        builder.append(", приоритет=");
         builder.append(region.getPriority());
         builder.append(")");
 
@@ -83,7 +83,7 @@ public class RegionPrintoutBuilder {
      */
     public void appendFlags() {
         builder.append(ChatColor.BLUE);
-        builder.append("Flags: ");
+        builder.append("Флаги: ");
         
         appendFlagsList(true);
         
@@ -135,7 +135,7 @@ public class RegionPrintoutBuilder {
             if (useColors) {
                 builder.append(ChatColor.RED);
             }
-            builder.append("(none)");
+            builder.append("(нет)");
         }
     }
     
@@ -191,7 +191,7 @@ public class RegionPrintoutBuilder {
                 if (useColors) {
                     builder.append(ChatColor.GRAY);
                 }
-                builder.append(" (parent, priority=" + cur.getPriority() + ")");
+                builder.append(" (родитель, приоритет=" + cur.getPriority() + ")");
             }
             
             indent++;
@@ -204,27 +204,27 @@ public class RegionPrintoutBuilder {
      */
     public void appendDomain() {
         builder.append(ChatColor.BLUE);
-        builder.append("Owners: ");
+        builder.append("Владельцы: ");
         DefaultDomain owners = region.getOwners();
         if (owners.size() != 0) {
             builder.append(ChatColor.YELLOW);
             builder.append(owners.toUserFriendlyString());
         } else {
             builder.append(ChatColor.RED);
-            builder.append("(no owners)");
+            builder.append("(нет владельцев)");
         }
 
         newLine();
 
         builder.append(ChatColor.BLUE);
-        builder.append("Members: ");
+        builder.append("Участники: ");
         DefaultDomain members = region.getMembers();
         if (members.size() != 0) {
             builder.append(ChatColor.YELLOW);
             builder.append(members.toUserFriendlyString());
         } else {
             builder.append(ChatColor.RED);
-            builder.append("(no members)");
+            builder.append("(нет участников)");
         }
         
         newLine();
@@ -237,7 +237,7 @@ public class RegionPrintoutBuilder {
         BlockVector min = region.getMinimumPoint();
         BlockVector max = region.getMaximumPoint();
         builder.append(ChatColor.BLUE);
-        builder.append("Bounds:");
+        builder.append("Границы:");
         builder.append(ChatColor.YELLOW);
         builder.append(" (" + min.getBlockX() + "," + min.getBlockY() + "," + min.getBlockZ() + ")");
         builder.append(" -> (" + max.getBlockX() + "," + max.getBlockY() + "," + max.getBlockZ() + ")");
@@ -250,9 +250,9 @@ public class RegionPrintoutBuilder {
      */
     public void appendRegionInfo() {
         builder.append(ChatColor.GRAY);
-        builder.append("\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550");
-        builder.append(" Region Info ");
-        builder.append("\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550");
+        builder.append("\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550");
+        builder.append(" Информация о регионе ");
+        builder.append("\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550");
         newLine();
         appendBasics();
         appendFlags();

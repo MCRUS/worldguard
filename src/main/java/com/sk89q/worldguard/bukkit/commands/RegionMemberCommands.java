@@ -64,7 +64,7 @@ public class RegionMemberCommands {
             if (player != null) {
                 world = player.getWorld();
             } else {
-                throw new CommandException("No world specified. Use -w <worldname>.");
+                throw new CommandException("Не выбрал мир. Используйте -w <название_мира>.");
             }
         }
 
@@ -120,7 +120,7 @@ public class RegionMemberCommands {
             if (player != null) {
                 world = player.getWorld();
             } else {
-                throw new CommandException("No world specified. Use -w <worldname>.");
+                throw new CommandException("Не выбрал мир. Используйте -w <название_мира>.");
             }
         }
 
@@ -143,7 +143,7 @@ public class RegionMemberCommands {
                     int maxRegionCount = plugin.getGlobalStateManager().get(world).getMaxRegionCount(player);
                     if (maxRegionCount >= 0 && mgr.getRegionCountOfPlayer(localPlayer)
                             >= maxRegionCount) {
-                        throw new CommandException("You already own the maximum allowed amount of regions.");
+                        throw new CommandException("У Вас превышен лими использования регионов.");
                     }
                 }
                 plugin.checkPermission(sender, "worldguard.region.addowner.unclaimed." + id.toLowerCase());
@@ -190,7 +190,7 @@ public class RegionMemberCommands {
             if (player != null) {
                 world = player.getWorld();
             } else {
-                throw new CommandException("No world specified. Use -w <worldname>.");
+                throw new CommandException("Не выбрал мир. Используйте -w <название_мира>.");
             }
         }
 
@@ -219,7 +219,7 @@ public class RegionMemberCommands {
             region.getMembers().removeAll();
         } else {
             if (args.argsLength() < 2) {
-                throw new CommandException("List some names to remove, or use -a to remove all.");
+                throw new CommandException("Укажите названия для удаления или используйте -a для удаления всех.");
             }
             RegionDBUtil.removeFromDomain(region.getMembers(), args.getParsedPaddedSlice(1, 0), 0);
         }
@@ -255,7 +255,7 @@ public class RegionMemberCommands {
             if (player != null) {
                 world = player.getWorld();
             } else {
-                throw new CommandException("No world specified. Use -w <worldname>.");
+                throw new CommandException("Не выбрал мир. Используйте -w <название_мира>.");
             }
         }
 
@@ -284,7 +284,7 @@ public class RegionMemberCommands {
             region.getOwners().removeAll();
         } else {
             if (args.argsLength() < 2) {
-                throw new CommandException("List some names to remove, or use -a to remove all.");
+                throw new CommandException("Укажите названия для удаления или используйте -a для удаления всех.");
             }
             RegionDBUtil.removeFromDomain(region.getOwners(), args.getParsedPaddedSlice(1, 0), 0);
         }
